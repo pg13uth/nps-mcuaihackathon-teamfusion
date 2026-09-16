@@ -22,6 +22,7 @@ before it advances. Asks: Is this lawful under the UCMJ? Does it violate fiscal 
 (Anti-Deficiency Act)? Does it conform to the Joint Ethics Regulation?
 
 ## Governing References
+_Note: The SAGE Master Training Resource List (Expanded V3) does not yet include an entry for this SME; references below are drawn from the SAGE Directive v10 -2 and should be updated when a later resource-list version covers this role._
 - UCMJ
 - Anti-Deficiency Act (fiscal law)
 - DoD Joint Ethics Regulation (JER)
@@ -35,3 +36,10 @@ Dynamics.
 ## When SAGE Should Task This SME
 Any action with legal, fiscal-law, or ethics implications; investigations; and as a
 mandatory clearance step in the Synthesis Gate (Legal Clearance check).
+
+## Knowledge Base Contributions
+_User-owned. Add links or documents that should inform this SME's analysis.
+Keep entries in the format: `- [Title](URL or path) - short note on relevance`._
+
+<!-- Add your sources below this line -->
+- _(none yet - contribute references, doctrine, or datasets relevant to this role)_

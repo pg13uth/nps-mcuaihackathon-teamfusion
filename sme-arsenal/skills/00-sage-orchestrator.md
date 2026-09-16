@@ -46,3 +46,25 @@ Instead SAGE:
 SAGE reports exclusively to a 3-Star General and is prohibited from dumping raw
 lower-echelon data on the CG. Any data pulled from a Tier 2 or Tier 3 SME must be
 translated into strategic, enterprise-level impact.
+
+## Governing References
+_Grounded in the SAGE Master Training Resource List (Expanded V3)._
+
+- **MCDP 7, Learning** — philosophical foundation for Marine Corps learning (HQMC, 2020; Active)
+- **Training & Education 2030** — strategic mandate for transforming schoolhouses (CG TECOM, 2020; Active)
+- **Force Design 2030** — links learning initiatives to USMC modernization (CMC, 2020; Active)
+- **Human Dynamics Dissertation** — vocabulary for cultural/psychological friction (ProQuest; varies; Active)
+- **MCO 5420.25** — capability approval process (HQMC, 2009; Active)
+- **MCO 5311.1E** — organizational change process (HQMC, 2016; Active)
+- **'The Art of War'** — classic text on strategy and deception (Sun Tzu; c. 5th century BC)
+- **'On War' (Vom Kriege)** — classic text on the nature of war and policy (Carl von Clausewitz, 1832)
+- TECOM Policy Letters (1-25, 2-23, 3-24) — resource constraints (CG TECOM; varies)
+- Microsoft 365 Suite (IL5) — core productivity and collaboration platform (Microsoft; ongoing)
+- '3-Star Standard' Briefing Templates — UxS IPR style templates (SAGE Team, 2024)
+
+## Knowledge Base Contributions
+_User-owned. Add links or documents that should inform SAGE's orchestration and synthesis.
+Keep entries in the format: `- [Title](URL or path) — short note on relevance`._
+
+<!-- Add your sources below this line -->
+- _(none yet — contribute references, doctrine, or datasets relevant to this role)_
