@@ -1,0 +1,137 @@
+/**
+ * Scoped styles for Task 13.2 components (RoutingBlockView + StagedOutputWorkspace).
+ *
+ * These live in a component-local stylesheet rather than the shared styles.css
+ * so this task does not collide with the concurrent Task 13.3 work. Class names
+ * are prefixed/namespaced to the components that use them.
+ */
+
+/* --- RoutingBlockView --- */
+
+.routing-block .routing-grid {
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.routing-block .routing-row {
+  display: grid;
+  grid-template-columns: 10rem 1fr;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.routing-block .routing-row dt {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #334155;
+}
+
+.routing-block .routing-row dd {
+  margin: 0;
+}
+
+.routing-block .routing-empty {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.routing-block .routing-sequence-order {
+  color: #475569;
+}
+
+/* --- StagedOutputWorkspace --- */
+
+.staged-output .staged-step {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
+}
+
+.staged-output .staged-step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.staged-output .staged-step-header h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.staged-output .staged-step-status {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.staged-output .status-pending {
+  color: #64748b;
+}
+
+.staged-output .status-generating {
+  color: #2563eb;
+}
+
+.staged-output .status-complete {
+  color: #16a34a;
+}
+
+.staged-output .status-failed {
+  color: #dc2626;
+}
+
+.staged-output .status-truncated {
+  color: #d97706;
+}
+
+.staged-output .staged-step-body {
+  margin: 0.5rem 0 0;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.8125rem;
+}
+
+/* Screen-reader-only utility for the status prefix. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- StagedOutputWorkspace: validation result --- */
+
+.staged-output .staged-step-validation {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+}
+
+.staged-output .staged-step-validation-summary {
+  margin: 0;
+  font-weight: 600;
+}
+
+.staged-output .validation-valid .staged-step-validation-summary {
+  color: #16a34a;
+}
+
+.staged-output .validation-invalid .staged-step-validation-summary {
+  color: #dc2626;
+}
+
+.staged-output .staged-step-validation ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.25rem;
+  color: #b91c1c;
+}

@@ -1,0 +1,6 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.sage-data/
+.env
+.env.local

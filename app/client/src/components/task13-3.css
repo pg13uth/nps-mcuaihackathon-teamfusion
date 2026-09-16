@@ -1,0 +1,174 @@
+/**
+ * Scoped styles for the Task 13.3 panels (SynthesisGatePanel, CcirAlertBanner,
+ * RunningEstimateView, DocumentLibraryView, AiConfigHealth).
+ *
+ * These class names are prefixed `sage-t3-` to avoid colliding with the shared
+ * styles.css owned by other tasks. Failure/alert emphasis never relies on color
+ * alone — components also render explicit PASS/FAIL/ALERT text.
+ */
+
+.sage-t3-panel {
+  border: 1px solid #cbd2d9;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  background: #ffffff;
+}
+
+.sage-t3-panel h2,
+.sage-t3-panel h3 {
+  margin-top: 0;
+}
+
+/* --- Synthesis Gate --- */
+.sage-t3-gate-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sage-t3-gate-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  border-left: 4px solid transparent;
+}
+
+.sage-t3-gate-item.is-pass {
+  background: #eef8f0;
+  border-left-color: #2e7d32;
+}
+
+.sage-t3-gate-item.is-fail {
+  background: #fdecec;
+  border-left-color: #b71c1c;
+}
+
+.sage-t3-status-tag {
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.sage-t3-status-tag.is-pass {
+  background: #2e7d32;
+  color: #fff;
+}
+
+.sage-t3-status-tag.is-fail {
+  background: #b71c1c;
+  color: #fff;
+}
+
+/* --- CCIR banner --- */
+.sage-t3-ccir-banner {
+  border: 2px solid #b71c1c;
+  border-radius: 6px;
+  background: #fdecec;
+  padding: 12px 16px;
+  margin: 12px 0;
+}
+
+.sage-t3-ccir-banner .sage-t3-ccir-title {
+  color: #7f1010;
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sage-t3-ccir-alert {
+  border-top: 1px solid #e6b3b3;
+  padding: 8px 0;
+}
+
+.sage-t3-ccir-alert:first-of-type {
+  border-top: none;
+}
+
+.sage-t3-ccir-category {
+  font-weight: 700;
+}
+
+.sage-t3-label {
+  font-weight: 600;
+}
+
+/* --- Document library --- */
+.sage-t3-doc-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sage-t3-doc-table th,
+.sage-t3-doc-table td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid #e4e7eb;
+  vertical-align: top;
+}
+
+.sage-t3-flag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-right: 4px;
+  text-transform: uppercase;
+}
+
+.sage-t3-flag.is-untagged {
+  background: #8a5300;
+  color: #fff;
+}
+
+.sage-t3-flag.is-superseded,
+.sage-t3-flag.is-draft {
+  background: #6a1b9a;
+  color: #fff;
+}
+
+.sage-t3-flag.is-usable {
+  background: #2e7d32;
+  color: #fff;
+}
+
+.sage-t3-tag-form {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.sage-t3-error {
+  color: #7f1010;
+  font-weight: 600;
+}
+
+/* --- AI health --- */
+.sage-t3-health-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.sage-t3-health-dot.is-ok {
+  background: #2e7d32;
+}
+
+.sage-t3-health-dot.is-bad {
+  background: #b71c1c;
+}
+
+.sage-t3-health-dot.is-unknown {
+  background: #8a8a8a;
+}
