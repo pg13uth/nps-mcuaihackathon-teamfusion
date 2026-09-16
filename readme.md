@@ -1,4 +1,4 @@
-# DC Summit 2026 Global Government Workshop — Team Repository
+# 2026 MCU-NPS AI Hackathon — Team Repository
 
 Welcome! This is your team's Git repository for the DC Summit 2026 Global Government Workshop. Use it to build, collaborate on, and submit your workshop project.
 
