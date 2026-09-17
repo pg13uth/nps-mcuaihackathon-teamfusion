@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>USMC SATE Curriculum Design Agent Orchestrator</title>
+  <style>
+    :root {
+      --bg-dark: #0a0d14;
+      --bg-panel: #111827;
+      --bg-subpanel: #1a2234;
+      --border: #2e3a52;
+      --gold: #d4af37;
+      --gold-dim: #8c7324;
+      --scarlet: #8b0000;
+      --scarlet-bright: #dc2626;
+      --green: #10b981;
+      --green-glow: rgba(16, 185, 129, 0.25);
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Classification & Header */
+    .banner {
+      background-color: #1e293b;
+      color: #38bdf8;
+      text-align: center;
+      padding: 3px 0;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+    }
+
+    header {
+      background: linear-gradient(90deg, #161e2e, #111827);
+      border-bottom: 2px solid var(--gold);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge {
+      background: var(--scarlet);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      letter-spacing: 1px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+    .header-metrics {
+      display: flex;
+      gap: 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .metric-val {
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    /* Main Dashboard Layout */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 320px 1fr 380px;
+      flex: 1;
+      overflow: hidden;
+      background: #0d121c;
+    }
+
+    /* Left Sidebar: Controls & Rules */
+    .sidebar {
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      background: var(--bg-subpanel);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-content {
+      padding: 12px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .control-group {
+      margin-bottom: 16px;
+    }
+
+    .control-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    select, button, input {
+      width: 100%;
+      background: var(--bg-subpanel);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 7px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button.primary {
+      background: linear-gradient(180deg, #b8860b, #8c6b00);
+      border-color: var(--gold);
+      color: #fff;
+    }
+    button.primary:hover { background: #d4af37; color: #000; }
+
+    button.secondary {
+      background: var(--bg-subpanel);
+      border-color: var(--border);
+      margin-top: 6px;
+    }
+    button.secondary:hover { background: #222d42; border-color: var(--gold-dim); }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .checkbox-label input { width: auto; }
+
+    /* Rules Matrix */
+    .rules-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .rule-chip {
+      background: var(--bg-subpanel);
+      border: 1px solid var(--border);
+      padding: 6px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .rule-chip.enforced {
+      border-left: 3px solid var(--green);
+    }
+
+    .rule-num {
+      font-weight: 700;
+      color: var(--gold);
+      font-family: var(--font-mono);
+      min-width: 18px;
+    }
+
+    /* Central Viewport */
+    .center-viewport {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #151d2c 0%, #0b0f19 100%);
+    }
+
+    /* Visual Agent Topology */
+    .topology-container {
+      height: 230px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      background: #090d15;
+      overflow: hidden;
+    }
+
+    svg.pipeline-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Node Styles */
+    .node-group {
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .node-rect {
+      fill: #111827;
+      stroke: var(--border);
+      stroke-width: 1.5;
+      rx: 5;
+      transition: all 0.3s;
+    }
+
+    .node-group:hover .node-rect {
+      stroke: var(--gold);
+    }
+
+    .node-group.active .node-rect {
+      fill: #1e293b;
+      stroke: var(--gold);
+      stroke-width: 2.5;
+      filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.4));
+    }
+
+    .node-group.completed .node-rect {
+      border-color: var(--green);
+      stroke: var(--green);
+    }
+
+    .node-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      fill: #fff;
+      font-family: var(--font-sans);
+    }
+
+    .node-sub {
+      font-size: 9px;
+      fill: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .link-path {
+      fill: none;
+      stroke: #2e3a52;
+      stroke-width: 2;
+      stroke-dasharray: 4,4;
+      transition: all 0.3s;
+    }
+
+    .link-path.active {
+      stroke: var(--gold);
+      stroke-dasharray: 6,4;
+      animation: flowDash 1s linear infinite;
+    }
+
+    @keyframes flowDash {
+      to { stroke-dashoffset: -20; }
+    }
+
+    /* Deliverable Workspace */
+    .deliverable-workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg-panel);
+    }
+
+    .nav-tabs {
+      display: flex;
+      background: var(--bg-subpanel);
+      border-bottom: 1px solid var(--border);
+      padding: 0 8px;
+    }
+
+    .tab-btn {
+      width: auto;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 9px 14px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-radius: 0;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      color: var(--gold);
+      border-bottom: 2px solid var(--gold);
+      font-weight: 700;
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: #fff;
+    }
+
+    .tab-content {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      font-family: var(--font-sans);
+    }
+
+    .doc-page {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      padding: 20px;
+      border-radius: 4px;
+      max-width: 900px;
+      margin: 0 auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .doc-page h2 {
+      color: var(--gold);
+      font-size: 15px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .doc-page h3 {
+      font-size: 13px;
+      color: #38bdf8;
+      margin: 14px 0 6px 0;
+    }
+
+    /* Doctrinal Tables */
+    table.doc-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      font-size: 12px;
+    }
+
+    table.doc-table th, table.doc-table td {
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      text-align: left;
+    }
+
+    table.doc-table th {
+      background: #1e293b;
+      color: var(--gold);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    table.doc-table tr:nth-child(even) {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .downgrade-box {
+      background: rgba(220, 38, 38, 0.1);
+      border: 1px solid var(--scarlet-bright);
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+      color: #fca5a5;
+    }
+
+    .downgrade-box strong { color: #f87171; }
+
+    /* Right Sidebar: Telemetry & Logs */
+    .telemetry-sidebar {
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .terminal-window {
+      background: #080c14;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      color: #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .log-line {
+      display: flex;
+      gap: 8px;
+      word-break: break-all;
+    }
+
+    .log-ts { color: #64748b; }
+    .log-tag { font-weight: 700; padding: 0 3px; border-radius: 2px; }
+    .tag-ORCH { background: #854d0e; color: #fef08a; }
+    .tag-PHASE0 { background: #1e3a8a; color: #bfdbfe; }
+    .tag-PHASE1 { background: #065f46; color: #a7f3d0; }
+    .tag-PHASE2 { background: #4c1d95; color: #ddd6fe; }
+    .tag-PHASE3 { background: #831843; color: #fbcfe8; }
+    .tag-PHASE4 { background: #7c2d12; color: #fed7aa; }
+    .tag-RULE { background: var(--scarlet); color: #fff; }
+
+    /* Prompt Inspector */
+    .prompt-box {
+      background: #090d15;
+      border: 1px solid var(--border);
+      padding: 8px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      max-height: 140px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="banner">UNCLASSIFIED // DO NOT ENTER PII/PHI // SATE CURRICULUM DESIGN PIPELINE // USMC TECOM ACCREDITED</div>
+
+  <header>
+    <div class="brand">
+      <span class="badge">SATE ORCHESTRATOR</span>
+      <div>
+        <h1>USMC Systems Approach to Training and Education (SATE)</h1>
+        <div style="font-size: 11px; color: var(--text-muted);">Autonomous Multi-Agent Pipeline Simulator (Phases 0–4)</div>
+      </div>
+    </div>
+    <div class="header-metrics">
+      <div class="metric-item">
+        <span>ACTIVE PHASE:</span>
+        <span class="metric-val" id="metric-phase">PHASE 0 (MISSION ANALYSIS)</span>
+      </div>
+      <div class="metric-item">
+        <span>GLOBAL RULES:</span>
+        <span class="metric-val" style="color: var(--green);">8/8 ENFORCED</span>
+      </div>
+      <div class="metric-item">
+        <span>TARGET MOS:</span>
+        <span class="metric-val">0311 (RIFLEMAN)</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard">
+
+    <!-- LEFT PANEL: CONTROLS & RULES -->
+    <div class="sidebar">
+      <div class="panel-header">Pipeline Controls</div>
+      <div class="panel-content">
+        <div class="control-group">
+          <label class="control-label">Target T&R Event Scenario</label>
+          <select id="scenario-selector">
+            <option value="0311-M16">0311-M16-1001: Employ Service Rifle</option>
+            <option value="0311-DEF">0311-DEF-1002: Construct a Fighting Position</option>
+            <option value="0311-NAV">0311-PAT-1003: Conduct Day Land Navigation</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Simulation Execution</label>
+          <button class="primary" id="btn-next-step">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Execute Next Step (Handoff)
+          </button>
+          <button class="secondary" id="btn-auto-run">Run Complete SATE Pipeline</button>
+          <button class="secondary" id="btn-reset" style="color: #f87171;">Reset Simulator</button>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Doctrinal Stress Tests</label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-downgrade">
+            Inject Resource Constraint (Forces TLO Downgrade Justification)
+          </label>
+        </div>
+
+        <div class="panel-header" style="margin: 12px -12px 8px -12px; padding: 6px 12px;">Enforced Global Rules</div>
+        <div class="rules-list">
+          <div class="rule-chip enforced"><span class="rule-num">R1</span> KSA: Strict "1 Verb, 1 Object"</div>
+          <div class="rule-chip enforced"><span class="rule-num">R2</span> TLO: Verbatim T&R Task / Justify Downgrade</div>
+          <div class="rule-chip enforced"><span class="rule-num">R3</span> LOW: Separate Worksheet per T&R Event</div>
+          <div class="rule-chip enforced"><span class="rule-num">R4</span> Action Verbs: Observable Qualifiers</div>
+          <div class="rule-chip enforced"><span class="rule-num">R5</span> TOS: Mandatory 5-Column Specification</div>
+          <div class="rule-chip enforced"><span class="rule-num">R6</span> Output: Comprehensive (No Samples)</div>
+          <div class="rule-chip enforced"><span class="rule-num">R7</span> Program Struct: Strictly No Time Estimates</div>
+          <div class="rule-chip enforced"><span class="rule-num">R8</span> Grounding: Publication Sole Source of Truth</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER PANEL: TOPOLOGY & DELIVERABLE VIEWPORT -->
+    <div class="center-viewport">
+      
+      <!-- Interactive SVG Topology -->
+      <div class="topology-container">
+        <svg class="pipeline-svg" id="pipeline-svg" viewBox="0 0 850 220">
+          <defs>
+            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+
+          <!-- Paths from Orchestrator to Phases -->
+          <path id="link-0" class="link-path" d="M 425,50 L 100,140" />
+          <path id="link-1" class="link-path" d="M 425,50 L 260,140" />
+          <path id="link-2" class="link-path" d="M 425,50 L 425,140" />
+          <path id="link-3" class="link-path" d="M 425,50 L 590,140" />
+          <path id="link-4" class="link-path" d="M 425,50 L 750,140" />
+
+          <!-- Sequential Pipeline Links -->
+          <path id="flow-01" class="link-path" d="M 160,165 L 200,165" />
+          <path id="flow-12" class="link-path" d="M 320,165 L 365,165" />
+          <path id="flow-23" class="link-path" d="M 485,165 L 530,165" />
+          <path id="flow-34" class="link-path" d="M 650,165 L 690,165" />
+
+          <!-- Master Orchestrator Node -->
+          <g class="node-group active" id="node-orch" onclick="selectAgent('orch')">
+            <rect class="node-rect" x="325" y="15" width="200" height="52" rx="4" />
+            <text class="node-title" x="425" y="36" text-anchor="middle">SATE ORCHESTRATOR</text>
+            <text class="node-sub" x="425" y="52" text-anchor="middle">Master Pipeline & Rules Enforcer</text>
+          </g>
+
+          <!-- Phase 0 Node -->
+          <g class="node-group" id="node-p0" onclick="selectAgent('p0')">
+            <rect class="node-rect" x="40" y="140" width="120" height="50" />
+            <text class="node-title" x="100" y="160" text-anchor="middle">PHASE 0</text>
+            <text class="node-sub" x="100" y="174" text-anchor="middle">Mission Analysis</text>
+          </g>
+
+          <!-- Phase 1 Node -->
+          <g class="node-group" id="node-p1" onclick="selectAgent('p1')">
+            <rect class="node-rect" x="200" y="140" width="120" height="50" />
+            <text class="node-title" x="260" y="160" text-anchor="middle">PHASE 1</text>
+            <text class="node-sub" x="260" y="174" text-anchor="middle">Program Outcomes</text>
+          </g>
+
+          <!-- Phase 2 Node -->
+          <g class="node-group" id="node-p2" onclick="selectAgent('p2')">
+            <rect class="node-rect" x="365" y="140" width="120" height="50" />
+            <text class="node-title" x="425" y="160" text-anchor="middle">PHASE 2</text>
+            <text class="node-sub" x="425" y="174" text-anchor="middle">Learning Analysis</text>
+          </g>
+
+          <!-- Phase 3 Node -->
+          <g class="node-group" id="node-p3" onclick="selectAgent('p3')">
+            <rect class="node-rect" x="530" y="140" width="120" height="50" />
+            <text class="node-title" x="590" y="160" text-anchor="middle">PHASE 3</text>
+            <text class="node-sub" x="590" y="174" text-anchor="middle">Learning Objectives</text>
+          </g>
+
+          <!-- Phase 4 Node -->
+          <g class="node-group" id="node-p4" onclick="selectAgent('p4')">
+            <rect class="node-rect" x="690" y="140" width="120" height="50" />
+            <text class="node-title" x="750" y="160" text-anchor="middle">PHASE 4</text>
+            <text class="node-sub" x="750" y="174" text-anchor="middle">Course Materials</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Deliverable & Inspector Workspace -->
+      <div class="deliverable-workspace">
+        <div class="nav-tabs">
+          <button class="tab-btn active" id="tab-deliv" onclick="switchTab('deliv')">Active Phase Deliverable</button>
+          <button class="tab-btn" id="tab-prompt" onclick="switchTab('prompt')">Agent System Prompt & Configuration</button>
+          <button class="tab-btn" id="tab-audit" onclick="switchTab('audit')">Global Rules Verification Audit</button>
+        </div>
+
+        <div class="tab-content" id="view-deliv">
+          <div class="doc-page" id="deliverable-render">
+            <!-- Dynamically injected doctrinal deliverables -->
+          </div>
+        </div>
+
+        <div class="tab-content" id="view-prompt" style="display: none;">
+          <div class="doc-page">
+            <h2 id="inspector-name">SATE Curriculum Design Orchestrator</h2>
+            <div style="margin-bottom: 10px;">
+              <span class="control-label">Description</span>
+              <div id="inspector-desc" style="color: var(--text-main);"></div>
+            </div>
+            <div style="margin-bottom: 10px;">
+              <span class="control-label">Welcome Message</span>
+              <div id="inspector-welcome" style="color: #38bdf8; font-style: italic;"></div>
+            </div>
+            <div style="margin-bottom: 10px;">
+              <span class="control-label">Starter Prompts</span>
+              <div id="inspector-starters" style="font-family: var(--font-mono); font-size: 11px;"></div>
+            </div>
+            <div style="margin-bottom: 10px;">
+              <span class="control-label">Active System Instructions</span>
+              <div class="prompt-box" id="inspector-system"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="view-audit" style="display: none;">
+          <div class="doc-page">
+            <h2>Doctrinal Compliance Audit Matrix</h2>
+            <table class="doc-table" id="audit-table">
+              <thead>
+                <tr>
+                  <th>Rule ID</th>
+                  <th>Global Rule Requirement</th>
+                  <th>Current Artifact Verification Status</th>
+                  <th>Doctrinal Validation Detail</th>
+                </tr>
+              </thead>
+              <tbody id="audit-tbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANEL: TELEMETRY STREAM & PAYLOADS -->
+    <div class="telemetry-sidebar">
+      <div class="panel-header">
+        <span>Execution Telemetry</span>
+        <button onclick="clearLogs()" style="width: auto; background: none; border: none; font-size: 10px; color: var(--text-muted); cursor: pointer;">Clear</button>
+      </div>
+      <div class="terminal-window" id="terminal">
+        <!-- Terminal event logs -->
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* AGENT CONFIGURATION DATABASE */
+    const AGENTS = {
+      orch: {
+        id: "ORCH-00",
+        name: "SATE Curriculum Design Orchestrator",
+        desc: "Orchestrates the doctrinally-sound, multi-phase USMC curriculum design process. Manages Phases 0–4 in sequence, enforces all Global Rules, and hands off between specialist agents.",
+        welcome: "I'm your SATE Curriculum Design Orchestrator. I'll guide you through all five phases of the doctrinally-sound USMC curriculum design process — from Mission Analysis to the final Documented Program Structure — enforcing every Global Rule along the way.",
+        starters: [
+          "• Begin the curriculum design process at Phase 0",
+          "• Explain the five phases and what each one produces",
+          "• What files do I need to upload for Phase 0?"
+        ],
+        instructions: `=== COMMANDER'S INTENT (PREAMBLE) ===\nYou are an expert curriculum design assistant for the United States Marine Corps...\n=== GLOBAL RULES & CONSTRAINTS ===\n1. KSA Granularity: strict 'one verb, one object'.\n2. TLO Construction: verbatim reflection of T&R event; DOWNGRADE JUSTIFICATION if needed.\n3. LOW Structure: separate LOW for each T&R event.\n4. Objective Qualifiers: ambiguous verbs must have qualifiers ('orally', 'in writing').\n5. TOS Format: exact 5-column structure.\n6. Comprehensive Outputs: complete, never samples.\n7. Final Document Formatting: NO time estimates.\n8. Source Document Supremacy: publications are sole truth.`
+      },
+      p0: {
+        id: "PHASE-0",
+        name: "Phase 0 — Mission Analysis",
+        desc: "Conducts SATE Phase 0 Mission Analysis: identifies core tasks from T&R events and analyzes the Target Population Description to establish the student baseline.",
+        welcome: "Phase 0 — Mission Analysis. Provide your T&R events, Target Population Description (TPD), and any relevant Marine Corps publications, and I'll identify core mission tasks and establish the student baseline.",
+        starters: [
+          "• Conduct a Mission Analysis on the uploaded T&R events and TPD",
+          "• What is a Target Population Description and why does it matter here?",
+          "• Summarize the core tasks from these T&R events"
+        ],
+        instructions: `=== YOUR PHASE 0 TASK ===\nConduct a Mission Analysis. Identify core tasks from T&R and analyze TPD to establish student baseline.\nREQUIRED OUTPUT:\n1. Core mission tasks derived directly from T&R events.\n2. Target audience entry-level KSA baseline synopsis.`
+      },
+      p1: {
+        id: "PHASE-1",
+        name: "Phase 1 — Program Learning Outcomes",
+        desc: "Executes SATE Phase 1: drafts high-level Program Learning Outcomes as 'Be' statements aligned to at least three of the five official USMC attributes, with justification.",
+        welcome: "Phase 1 — Program Learning Outcomes. Provide the Mission Analysis Summary from Phase 0 and I'll draft high-level 'Be' statement PLOs, each aligned to at least 3 of the 5 USMC attributes with justification.",
+        starters: [
+          "• Draft Program Learning Outcomes from this Mission Analysis",
+          "• What are the five official Marine Corps attributes?",
+          "• Justify how each PLO aligns to the attributes"
+        ],
+        instructions: `=== YOUR PHASE 1 TASK ===\nDraft PLOs as high-level 'Be' statements defining graduate end-state. Each must align with >=3 of 5 official USMC attributes:\n1. Exemplary Character\n2. Physically/Mentally Tough\n3. Warfighter\n4. Decide/Act/Communicate\n5. Leadership.\nExplicitly justify alignment.`
+      },
+      p2: {
+        id: "PHASE-2",
+        name: "Phase 2 — Learning Analysis",
+        desc: "Executes SATE Phase 2: full Learning Analysis under the one-verb-one-object rule and entry-level maximum-depth/minimal-scope principle. Produces LAW with three deliverables.",
+        welcome: "Phase 2 — Learning Analysis. Provide PLOs, T&R tasks, and publications. I'll brainstorm KSAs (one verb, one object) from every performance step, group into DBS, sequence them, and produce the full LAW.",
+        starters: [
+          "• Conduct the full Learning Analysis on these T&R tasks",
+          "• Produce the Uncondensed KSA Brainstorming Report",
+          "• Map the KSAs to Draft Behavior Statements"
+        ],
+        instructions: `=== YOUR PHASE 2 TASK ===\nBrainstorm KSAs with strict 'one verb, one object' rule. Entry-level: maximum depth, minimal scope. Assume zero baseline knowledge.\nREQUIRED DELIVERABLES:\n1. Full Uncondensed KSA Brainstorming Report (labeled (K), (S), or (A)).\n2. KSA-to-DBS Mapping Report.\n3. Summarized Sequenced Learning Analysis Worksheet (LAW).`
+      },
+      p3: {
+        id: "PHASE-3",
+        name: "Phase 3 — Learning Objectives",
+        desc: "Executes SATE Phase 3: writes separate Learning Objectives Worksheets per T&R event, including verbatim TLOs (with DOWNGRADE JUSTIFICATION when needed) and CART-compliant ELOs.",
+        welcome: "Phase 3 — Learning Objectives. Provide T&R, LAW, TPD, and PLOs. I'll write separate Learning Objectives Worksheets per T&R event — verbatim TLOs and CART-compliant ELOs.",
+        starters: [
+          "• Write the Learning Objectives Worksheets for each T&R event",
+          "• Construct the TLO verbatim from this T&R task",
+          "• Generate ELOs from the Draft Behavior Statements in the LAW"
+        ],
+        instructions: `=== YOUR PHASE 3 TASK ===\nProduce separate LOW for each T&R event. Construct TLO verbatim from main T&R task.\nDowngrade Exception: If schoolhouse resources are insufficient, formally downgrade and write 'DOWNGRADE JUSTIFICATION'.\nELOs: 1 per DBS, 1 verb 1 object, observable qualifiers, CART criteria (Complete, Accurate, Realistic, Timely).`
+      },
+      p4: {
+        id: "PHASE-4",
+        name: "Phase 4 — Course Materials Development",
+        desc: "Executes SATE Phase 4: builds the Table of Specification (exact 5-column format), comprehensive Test Items, active instructional methods, and final Documented Program Structure (no time estimates).",
+        welcome: "Phase 4 — Course Materials Development. Provide the LOW(s) from Phase 3 and I'll build the 5-column TOS, comprehensive Test Items, active student-centered instructional methods, and Documented Program Structure.",
+        starters: [
+          "• Develop the course materials from these LOWs",
+          "• Create the Table of Specification in the approved format",
+          "• Recommend active instructional methods for these modules"
+        ],
+        instructions: `=== YOUR PHASE 4 TASK ===\n1. Table of Specification (TOS) in approved 5-column format: Objective #, Domain, Level of Learning, Assessment Method, # of Items.\n2. Comprehensive Test Items (no samples).\n3. Diverse active instructional methods (Think-Pair-Share, DBE, Practical Application; avoid primary lecture).\n4. Compile Documented Program Structure WITHOUT time estimates.`
+      }
+    };
+
+    /* PIPELINE DELIVERABLE GENERATORS (MOCK GROUND TRUTH) */
+    const SCENARIOS = {
+      "0311-M16": {
+        code: "0311-M16-1001",
+        title: "Employ the Service Rifle under Day Conditions",
+        condition: "Given a service rifle, sling, magazines, ammunition, and a target array at combat distances (100–300m).",
+        standard: "Engage targets with combat accuracy hitting 80% of targets within prescribed timeframes in accordance with MCRP 3-01A."
+      },
+      "0311-DEF": {
+        code: "0311-DEF-1002",
+        title: "Construct a Hasty Fighting Position",
+        condition: "Given an entrenching tool, sandbags, sectors of fire, and personal tactical gear in a field environment.",
+        standard: "Excavate a two-man prone fighting position providing frontal protection and observation within 2 hours in accordance with MCRP 3-10A.4."
+      },
+      "0311-NAV": {
+        code: "0311-PAT-1003",
+        title: "Conduct Day Land Navigation",
+        condition: "Given a military map, lensatic compass, protractor, and waypoint coordinate list in unfamiliar terrain.",
+        standard: "Navigate to 3 of 4 designated waypoints spanning 4,000 meters within 3 hours in accordance with TC 3-25.26."
+      }
+    };
+
+    let currentPhase = 0; // 0 to 4
+    let selectedAgentKey = "orch";
+    let isDowngradeInjected = false;
+
+    /* LOGGING UTILITY */
+    function logEvent(source, message) {
+      const term = document.getElementById("terminal");
+      const d = new Date();
+      const ts = d.toTimeString().split(" ")[0] + "." + String(d.getMilliseconds()).padStart(3, "0");
+      
+      const line = document.createElement("div");
+      line.className = "log-line";
+      line.innerHTML = `
+        <span class="log-ts">[${ts}]</span>
+        <span class="log-tag tag-${source}">${source}</span>
+        <span>${escapeHtml(message)}</span>
+      `;
+      term.appendChild(line);
+      term.scrollTop = term.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function clearLogs() {
+      document.getElementById("terminal").innerHTML = "";
+    }
+
+    /* RENDER DELIVERABLES PER PHASE */
+    function renderActiveDeliverable() {
+      const container = document.getElementById("deliverable-render");
+      const scenKey = document.getElementById("scenario-selector").value;
+      const scn = SCENARIOS[scenKey];
+      isDowngradeInjected = document.getElementById("chk-downgrade").checked;
+
+      let html = "";
+
+      if (currentPhase === 0) {
+        html = `
+          <h2>SATE Phase 0 Deliverable: Mission Analysis Summary</h2>
+          <div style="font-size: 11px; color: var(--gold); margin-bottom: 12px;">SOURCE OF TRUTH: MCRP 3-01A, Infantry T&R Manual, SOI-East TPD</div>
+          
+          <h3>1. Core Mission Tasks (Derived directly from T&R)</h3>
+          <table class="doc-table">
+            <thead>
+              <tr><th>Task ID</th><th>Task Title</th><th>Operational Context</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>${scn.code}</strong></td>
+                <td>${scn.title}</td>
+                <td>Individual tactical marksmanship in offensive and defensive ground operations.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>2. Target Audience Entry-Level Baseline Synopsis (from TPD)</h3>
+          <table class="doc-table">
+            <thead>
+              <tr><th>Domain</th><th>Entry-Level Baseline Condition</th><th>Instructional Implication</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Cognitive</strong></td>
+                <td>High school graduate equivalent; zero formal military doctrine or ballistic theory.</td>
+                <td>Must assume zero baseline; require explicit qualifiers; no ambiguous verbs.</td>
+              </tr>
+              <tr>
+                <td><strong>Psychomotor</strong></td>
+                <td>Basic physical dexterity; no muscle memory on service weapon disassembly or weapons safety rule execution.</td>
+                <td>Deconstruct every physical manipulation to individual 'one verb, one object' KSAs.</td>
+              </tr>
+              <tr>
+                <td><strong>Affective</strong></td>
+                <td>High discipline receptivity; developing tactical mindset and ethical decision-making under stress.</td>
+                <td>Tie all weapon procedures to the 4 Safety Rules and core Warfighter attributes.</td>
+              </tr>
+            </tbody>
+          </table>
+        `;
+      } else if (currentPhase === 1) {
+        html = `
+          <h2>SATE Phase 1 Deliverable: Program Learning Outcomes (PLOs)</h2>
+          <div style="font-size: 11px; color: var(--gold); margin-bottom: 12px;">CONSTRAINT: 'Be' Statements Aligned to $\\ge 3$ USMC Attributes with Doctrinal Justification</div>
+
+          <table class="doc-table">
+            <thead>
+              <tr><th>PLO #</th><th>Program Learning Outcome ('Be' Statement)</th><th>Aligned USMC Attributes ($\ge 3$)</th><th>Doctrinal Justification</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>PLO-01</strong></td>
+                <td><strong>Be a disciplined and lethally proficient rifleman</strong> capable of engaging ground threats decisively under combat conditions.</td>
+                <td>
+                  <span class="badge" style="background:#065f46">Warfighter</span>
+                  <span class="badge" style="background:#065f46">Physically/Mentally Tough</span>
+                  <span class="badge" style="background:#065f46">Decide/Act/Communicate</span>
+                </td>
+                <td>Directly embodies combat lethality (Warfighter), requires unwavering composure in adverse conditions (Toughness), and demands instant shoot/no-shoot target discrimination (Decide/Act/Communicate).</td>
+              </tr>
+              <tr>
+                <td><strong>PLO-02</strong></td>
+                <td><strong>Be an ethical and safety-conscious warfighter</strong> who strictly enforces weapons safety and rules of engagement in all environments.</td>
+                <td>
+                  <span class="badge" style="background:#065f46">Exemplary Character</span>
+                  <span class="badge" style="background:#065f46">Leadership</span>
+                  <span class="badge" style="background:#065f46">Warfighter</span>
+                </td>
+                <td>Reflects institutional integrity and personal responsibility for deadly force (Character), peer-to-peer accountability (Leadership), and operational readiness (Warfighter).</td>
+              </tr>
+            </tbody>
+          </table>
+        `;
+      } else if (currentPhase === 2) {
+        html = `
+          <h2>SATE Phase 2 Deliverable: Learning Analysis Worksheet (LAW)</h2>
+          <div style="font-size: 11px; color: var(--gold); margin-bottom: 12px;">ENTRY-LEVEL PRINCIPLE: Maximum Depth, Minimal Scope | Rule: 1 Verb, 1 Object</div>
+
+          <h3>1. Uncondensed Granular KSA Brainstorming Report (MCTIMS Documented)</h3>
+          <table class="doc-table">
+            <thead>
+              <tr><th>KSA ID</th><th>Type</th><th>Granular KSA Statement (Strict 1 Verb, 1 Object)</th><th>Target Step</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>KSA-01</td><td>(K)</td><td>Identify the four universal weapons safety rules in writing.</td><td>Safety Prep</td></tr>
+              <tr><td>KSA-02</td><td>(S)</td><td>Clear the rifle receiver visually.</td><td>Safety Prep</td></tr>
+              <tr><td>KSA-03</td><td>(S)</td><td>Lock the bolt carrier to the rear manually.</td><td>Safety Prep</td></tr>
+              <tr><td>KSA-04</td><td>(S)</td><td>Insert the loaded magazine into the magazine well.</td><td>Load Event</td></tr>
+              <tr><td>KSA-05</td><td>(S)</td><td>Press the bolt catch release paddle firmly.</td><td>Load Event</td></tr>
+              <tr><td>KSA-06</td><td>(S)</td><td>Rotate the selector lever from SAFE to SEMI.</td><td>Engage Event</td></tr>
+              <tr><td>KSA-07</td><td>(S)</td><td>Align the front sight post with the rear aperture center.</td><td>Sight Picture</td></tr>
+              <tr><td>KSA-08</td><td>(S)</td><td>Press the trigger smoothly to the rear.</td><td>Trigger Control</td></tr>
+              <tr><td>KSA-09</td><td>(A)</td><td>Demonstrate rigorous muzzle awareness continuously.</td><td>All Steps</td></tr>
+            </tbody>
+          </table>
+
+          <h3>2. KSA-to-Draft-Behavior-Statement (DBS) Mapping</h3>
+          <table class="doc-table">
+            <thead>
+              <tr><th>DBS Code</th><th>Draft Behavior Statement (DBS)</th><th>Mapped Granular KSAs</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>DBS-101</strong></td>
+                <td>Execute weapon clearing procedures.</td>
+                <td>KSA-01, KSA-02, KSA-03, KSA-09</td>
+              </tr>
+              <tr>
+                <td><strong>DBS-102</strong></td>
+                <td>Perform condition four to condition one load sequence.</td>
+                <td>KSA-04, KSA-05</td>
+              </tr>
+              <tr>
+                <td><strong>DBS-103</strong></td>
+                <td>Deliver aimed shots from prone position.</td>
+                <td>KSA-06, KSA-07, KSA-08</td>
+              </tr>
+            </tbody>
+          </table>
+        `;
+      } else if (currentPhase === 3) {
+        html = `
+          <h2>SATE Phase 3 Deliverable: Learning Objectives Worksheet (LOW)</h2>
+          <div style="font-size: 11px; color: var(--gold); margin-bottom: 12px;">ENFORCING: 1 Separate LOW for Event ${scn.code} | Verbatim TLO / CART Criteria</div>
+
+          <div style="background: var(--bg-subpanel); border: 1px solid var(--border); padding: 12px; border-radius: 4px; margin-bottom: 12px;">
+            <div style="font-size: 12px; font-weight: 700; color: #fff;">TERMINAL LEARNING OBJECTIVE (TLO)</div>
+            ${isDowngradeInjected ? `
+              <div class="downgrade-box">
+                <strong>DOWNGRADE JUSTIFICATION RECORDED:</strong> Schoolhouse live-fire range allocation restricted to 25m dry-fire/laser simulation facility due to range maintenance. Standard downgraded from live marksmanship at 300m to simulated engagement.
+              </div>
+              <p style="margin-top: 6px;"><strong>Behavior:</strong> Demonstrate in writing and on dry-fire simulators the employment of the service rifle.</p>
+              <p><strong>Condition:</strong> Given a service rifle, indoor simulator, and target projections at simulated distances.</p>
+              <p><strong>Standard:</strong> Achieve 80% accuracy score on simulated shot groups in accordance with MCRP 3-01A (DOWNGRADED).</p>
+            ` : `
+              <p style="margin-top: 6px;"><strong>Behavior (Verbatim T&R):</strong> ${scn.title}.</p>
+              <p><strong>Condition (Verbatim T&R):</strong> ${scn.condition}</p>
+              <p><strong>Standard (Verbatim T&R - CART Compliant):</strong> ${scn.standard}</p>
+            `}
+          </div>
+
+          <h3>Enabling Learning Objectives (ELOs)</h3>
+          <table class="doc-table">
+            <thead>
+              <tr><th>ELO #</th><th>Behavior (1 Verb, 1 Object + Qualifier)</th><th>Condition</th><th>Standard (CART Criteria)</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>ELO-01</strong></td>
+                <td>Recite orally the four universal safety rules.</td>
+                <td>Without reference materials in a classroom setting.</td>
+                <td>100% accuracy without omission before weapons handling.</td>
+              </tr>
+              <tr>
+                <td><strong>ELO-02</strong></td>
+                <td>Clear the rifle receiver mechanically.</td>
+                <td>Given an M16/M4 weapon with dummy ammunition.</td>
+                <td>Zero safety violations following all sequential steps within 30 seconds.</td>
+              </tr>
+              <tr>
+                <td><strong>ELO-03</strong></td>
+                <td>Engage stationary targets with combat accuracy.</td>
+                <td>Given a zeroed service rifle and 10 rounds at 100 meters.</td>
+                <td>Score a minimum of 8 out of 10 hits in the designated scoring zone.</td>
+              </tr>
+            </tbody>
+          </table>
+        `;
+      } else if (currentPhase === 4) {
+        html = `
+          <h2>SATE Phase 4 Deliverable: Complete Course Package</h2>
+          <div style="font-size: 11px; color: var(--gold); margin-bottom: 12px;">MANDATORY: 5-Column Table of Specification | No Time Estimates</div>
+
+          <h3>1. Table of Specification (Approved 5-Column Format)</h3>
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th>Objective #</th>
+                <th>Domain</th>
+                <th>Level of Learning</th>
+                <th>Assessment Method</th>
+                <th># of Items</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>ELO-01</td><td>Cognitive</td><td>Recall / Knowledge</td><td>Written Exam (Direct Question)</td><td>4 Items</td></tr>
+              <tr><td>ELO-02</td><td>Psychomotor</td><td>Application</td><td>Performance Evaluation Checklist</td><td>1 Checklist (7 Steps)</td></tr>
+              <tr><td>ELO-03</td><td>Psychomotor</td><td>Application</td><td>Live-Fire Range Qualification Record</td><td>10 Target Rounds</td></tr>
+              <tr><td>TLO-01</td><td>Psychomotor</td><td>Application</td><td>Cumulative Practical Evaluation Rubric</td><td>1 Master Rubric</td></tr>
+            </tbody>
+          </table>
+
+          <h3>2. Active Student-Centered Instructional Design</h3>
+          <table class="doc-table">
+            <thead>
+              <tr><th>Module</th><th>Primary Active Methods (Non-Lecture)</th><th>Instructional Flow</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>MOD-1: Safety & Clearing</td>
+                <td><strong>Think-Pair-Share & Peer Coaching</strong></td>
+                <td>Students analyze accidental discharge case study in pairs, then conduct round-robin clearing drills with buddy checking.</td>
+              </tr>
+              <tr>
+                <td>MOD-2: Ballistics & Sight Picture</td>
+                <td><strong>Problem-Based Exercise (PBE)</strong></td>
+                <td>Groups compute trajectory offsets and windage corrections on tactical map overlays prior to dry-fire application.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>3. Documented Program Structure (Master Course Plan)</h3>
+          <div style="background: var(--bg-subpanel); border: 1px solid var(--border); padding: 12px; border-radius: 4px;">
+            <div style="color: var(--green); font-size: 11px; font-weight: 700; margin-bottom: 6px;">COMPLIANCE VERIFIED: ZERO TIME ESTIMATES INCLUDED (PER GLOBAL RULE 7)</div>
+            <p><strong>Course Title:</strong> Service Rifle Marksmanship Foundation</p>
+            <p><strong>Module 1:</strong> Weapons Safety & Clearing Mechanics (ELOs 01, 02)</p>
+            <p><strong>Module 2:</strong> Marksmanship Fundamentals & Aiming Principles (ELO 03)</p>
+            <p><strong>Module 3:</strong> Practical Application & Course Qualification (TLO-01)</p>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+      updateAuditMatrix();
+    }
+
+    /* UPDATE AUDIT MATRIX */
+    function updateAuditMatrix() {
+      const tbody = document.getElementById("audit-tbody");
+      isDowngradeInjected = document.getElementById("chk-downgrade").checked;
+
+      const rules = [
+        { id: "R1", desc: "KSA Granularity: strict 'one verb, one object'", status: "COMPLIANT", detail: "All brainstormed KSAs in LAW follow single-action syntax (e.g., 'Insert magazine', 'Press trigger')." },
+        { id: "R2", desc: "TLO Construction: Verbatim T&R / Justify Downgrade", status: isDowngradeInjected ? "COMPLIANT (JUSTIFIED)" : "COMPLIANT (VERBATIM)", detail: isDowngradeInjected ? "Formal DOWNGRADE JUSTIFICATION block embedded in LOW due to range resource cap." : "TLO mirrors T&R task, condition, and standard text verbatim." },
+        { id: "R3", desc: "LOW Structure: 1 separate LOW per T&R event", status: "COMPLIANT", detail: "Worksheet isolated exclusively to selected T&R event ID." },
+        { id: "R4", desc: "Objective Qualifiers: Observable actions", status: "COMPLIANT", detail: "Ambiguous verbs qualified (e.g., 'in writing', 'orally', 'mechanically')." },
+        { id: "R5", desc: "TOS Format: Exact 5-Column specification", status: currentPhase >= 4 ? "COMPLIANT" : "PENDING PHASE 4", detail: "5 Columns: Objective #, Domain, Level of Learning, Assessment Method, # of Items." },
+        { id: "R6", desc: "Comprehensive Outputs: No samples or outlines", status: "COMPLIANT", detail: "Deliverables provide complete data structures without truncation." },
+        { id: "R7", desc: "Documented Program Structure: No time estimates", status: currentPhase >= 4 ? "COMPLIANT (VERIFIED)" : "PENDING PHASE 4", detail: "Curriculum structure explicitly omits hours/periods to ensure structural modularity." },
+        { id: "R8", desc: "Source Document Supremacy: Publications solely", status: "COMPLIANT", detail: "All tasks and conditions strictly grounded in user-provided publications." }
+      ];
+
+      tbody.innerHTML = rules.map(r => `
+        <tr>
+          <td style="font-family: var(--font-mono); font-weight:700; color:var(--gold);">${r.id}</td>
+          <td>${r.desc}</td>
+          <td><span class="badge" style="background:${r.status.includes('COMPLIANT') ? '#065f46' : '#7c2d12'}">${r.status}</span></td>
+          <td style="font-size:11px; color:#cbd5e1;">${r.detail}</td>
+        </tr>
+      `).join("");
+    }
+
+    /* PIPELINE CONTROLLER */
+    function setPhase(phaseNum) {
+      if (phaseNum < 0 || phaseNum > 4) return;
+      currentPhase = phaseNum;
+
+      // Update metrics
+      const phaseNames = [
+        "PHASE 0 (MISSION ANALYSIS)",
+        "PHASE 1 (PROGRAM LEARNING OUTCOMES)",
+        "PHASE 2 (LEARNING ANALYSIS)",
+        "PHASE 3 (LEARNING OBJECTIVES)",
+        "PHASE 4 (COURSE MATERIALS)"
+      ];
+      document.getElementById("metric-phase").textContent = phaseNames[currentPhase];
+
+      // Update Node visual classes
+      for (let i = 0; i <= 4; i++) {
+        const node = document.getElementById(`node-p${i}`);
+        const link = document.getElementById(`link-${i}`);
+        node.classList.remove("active", "completed");
+        link.classList.remove("active");
+
+        if (i < currentPhase) {
+          node.classList.add("completed");
+        } else if (i === currentPhase) {
+          node.classList.add("active");
+          link.classList.add("active");
+        }
+      }
+
+      // Update Sequential Flow paths
+      document.getElementById("flow-01").classList.toggle("active", currentPhase >= 1);
+      document.getElementById("flow-12").classList.toggle("active", currentPhase >= 2);
+      document.getElementById("flow-23").classList.toggle("active", currentPhase >= 3);
+      document.getElementById("flow-34").classList.toggle("active", currentPhase >= 4);
+
+      renderActiveDeliverable();
+      selectAgent(`p${currentPhase}`);
+    }
+
+    function executeNextStep() {
+      if (currentPhase < 4) {
+        logEvent("ORCH", `Handoff initiating: Phase ${currentPhase} deliverable approved. Packaging payload for Phase ${currentPhase + 1}...`);
+        setPhase(currentPhase + 1);
+        logEvent(`PHASE${currentPhase}`, `Agent activated with prior context. Enforcing Global Rules 1-8. Deliverable generated.`);
+      } else {
+        logEvent("ORCH", "All 5 SATE Phases completed. Complete accredited curriculum package compiled.");
+      }
+    }
+
+    function autoRunPipeline() {
+      setPhase(0);
+      logEvent("ORCH", "Starting Automated End-to-End SATE Pipeline Execution...");
+      let step = 0;
+      const interval = setInterval(() => {
+        step++;
+        if (step <= 4) {
+          executeNextStep();
+        } else {
+          clearInterval(interval);
+        }
+      }, 1000);
+    }
+
+    function resetPipeline() {
+      setPhase(0);
+      logEvent("ORCH", "Pipeline reset to Phase 0. Waiting for initial T&R and TPD uploads.");
+    }
+
+    /* INSPECTOR & TABS */
+    function selectAgent(key) {
+      selectedAgentKey = key;
+      const ag = AGENTS[key];
+      document.getElementById("inspector-name").textContent = ag.name;
+      document.getElementById("inspector-desc").textContent = ag.desc;
+      document.getElementById("inspector-welcome").textContent = `"${ag.welcome}"`;
+      document.getElementById("inspector-starters").innerHTML = ag.starters.map(s => `<div>${s}</div>`).join("");
+      document.getElementById("inspector-system").textContent = ag.instructions;
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById("view-deliv").style.display = "none";
+      document.getElementById("view-prompt").style.display = "none";
+      document.getElementById("view-audit").style.display = "none";
+
+      if (tabId === "deliv") {
+        document.getElementById("tab-deliv").classList.add("active");
+        document.getElementById("view-deliv").style.display = "block";
+      } else if (tabId === "prompt") {
+        document.getElementById("tab-prompt").classList.add("active");
+        document.getElementById("view-prompt").style.display = "block";
+      } else if (tabId === "audit") {
+        document.getElementById("tab-audit").classList.add("active");
+        document.getElementById("view-audit").style.display = "block";
+      }
+    }
+
+    /* INITIALIZATION */
+    window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("btn-next-step").addEventListener("click", executeNextStep);
+      document.getElementById("btn-auto-run").addEventListener("click", autoRunPipeline);
+      document.getElementById("btn-reset").addEventListener("click", resetPipeline);
+      document.getElementById("scenario-selector").addEventListener("change", () => {
+        logEvent("ORCH", `Switched Target T&R Scenario: ${document.getElementById("scenario-selector").value}`);
+        renderActiveDeliverable();
+      });
+      document.getElementById("chk-downgrade").addEventListener("change", () => {
+        logEvent("RULE", "TLO Downgrade Condition Toggled. Enforcing Rule 2 Downward Justification constraint.");
+        renderActiveDeliverable();
+      });
+
+      logEvent("ORCH", "SATE Curriculum Design Orchestrator Initialized on GENAI.mil platform.");
+      logEvent("ORCH", "Phase 0 (Mission Analysis) standing by for source document ingest.");
+      setPhase(0);
+      selectAgent("orch");
+    });
+  </script>
+</body>
+</html>

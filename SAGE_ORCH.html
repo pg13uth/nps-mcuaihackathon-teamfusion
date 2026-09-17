@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TECOM SAGE Master Orchestrator (Version 10)</title>
+  <style>
+    :root {
+      --bg-dark: #070a12;
+      --bg-panel: #0e1424;
+      --bg-subpanel: #161f36;
+      --border: #23314e;
+      --border-bright: #3b82f6;
+      --gold: #d4af37;
+      --gold-dim: #937a28;
+      --scarlet: #881337;
+      --scarlet-bright: #e11d48;
+      --amber: #d97706;
+      --green: #059669;
+      --green-bright: #10b981;
+      --cyan: #0284c7;
+      --cyan-bright: #38bdf8;
+      --purple: #7c3aed;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Classification Header */
+    .banner {
+      background: #0f172a;
+      color: var(--gold);
+      text-align: center;
+      padding: 3px 0;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header {
+      background: linear-gradient(90deg, #111a2f 0%, #0e1424 100%);
+      border-bottom: 2px solid var(--gold);
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge {
+      background: var(--scarlet);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 3px;
+      letter-spacing: 1px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .badge-tier1 { background: #1e3a8a; color: #93c5fd; }
+    .badge-tier2 { background: #4c1d95; color: #c4b5fd; }
+    .badge-tier3 { background: #065f46; color: #6ee7b7; }
+    .badge-alert { background: var(--scarlet-bright); color: #fff; animation: pulseAlert 1.5s infinite; }
+
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    h1 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-metrics {
+      display: flex;
+      gap: 18px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .metric-val {
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    /* Main Grid Layout */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 330px 1fr 380px;
+      flex: 1;
+      overflow: hidden;
+      background: #090e1a;
+    }
+
+    /* Sidebars */
+    .sidebar {
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      background: var(--bg-subpanel);
+      padding: 8px 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-content {
+      padding: 12px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .control-group {
+      margin-bottom: 14px;
+    }
+
+    .control-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    select, button, input {
+      width: 100%;
+      background: var(--bg-subpanel);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button.primary {
+      background: linear-gradient(180deg, #b8860b, #8c6b00);
+      border-color: var(--gold);
+      color: #fff;
+      padding: 8px;
+    }
+    button.primary:hover { background: #d4af37; color: #000; }
+
+    button.secondary {
+      background: var(--bg-subpanel);
+      border-color: var(--border);
+      margin-top: 5px;
+      padding: 6px;
+    }
+    button.secondary:hover { background: #202b47; border-color: var(--gold-dim); }
+
+    /* Hierarchy of Truth Indicator */
+    .hot-box {
+      background: var(--bg-subpanel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px;
+      margin-top: 6px;
+      font-size: 11px;
+    }
+    .hot-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 0;
+      border-bottom: 1px dashed rgba(255,255,255,0.06);
+    }
+    .hot-step:last-child { border-bottom: none; }
+    .hot-num {
+      font-weight: 700;
+      font-family: var(--font-mono);
+      width: 18px;
+      color: var(--gold);
+    }
+
+    /* Running Staff Estimate Block */
+    .estimate-card {
+      background: #0b1120;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      margin-top: 10px;
+    }
+    .estimate-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 0;
+    }
+
+    /* Central Viewport */
+    .center-viewport {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #111a2f 0%, #080c16 100%);
+    }
+
+    /* Topology Canvas */
+    .topology-container {
+      height: 250px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      background: #070b14;
+      overflow: hidden;
+    }
+
+    svg.topo-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .node-rect {
+      fill: #0e172a;
+      stroke: var(--border);
+      stroke-width: 1.5;
+      rx: 4;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .node-rect:hover {
+      stroke: var(--gold);
+    }
+
+    .node-group.active .node-rect {
+      fill: #1e293b;
+      stroke: var(--gold);
+      stroke-width: 2;
+      filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.4));
+    }
+
+    .node-group.mobilized .node-rect {
+      stroke: var(--cyan-bright);
+      fill: #0f2744;
+      stroke-width: 2;
+    }
+
+    .node-title {
+      font-size: 10px;
+      font-weight: 700;
+      fill: #fff;
+      font-family: var(--font-sans);
+      pointer-events: none;
+    }
+
+    .node-sub {
+      font-size: 8.5px;
+      fill: var(--text-muted);
+      font-family: var(--font-mono);
+      pointer-events: none;
+    }
+
+    .link-path {
+      fill: none;
+      stroke: #1e293b;
+      stroke-width: 1.5;
+      stroke-dasharray: 3,3;
+      transition: all 0.3s;
+    }
+
+    .link-path.active {
+      stroke: var(--gold);
+      stroke-dasharray: 6,3;
+      animation: flowDash 0.8s linear infinite;
+    }
+
+    @keyframes flowDash {
+      to { stroke-dashoffset: -18; }
+    }
+
+    /* Main Workspace Tabs */
+    .workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg-panel);
+    }
+
+    .nav-tabs {
+      display: flex;
+      background: var(--bg-subpanel);
+      border-bottom: 1px solid var(--border);
+      padding: 0 8px;
+    }
+
+    .tab-btn {
+      width: auto;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 8px 14px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      border-radius: 0;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      color: var(--gold);
+      border-bottom: 2px solid var(--gold);
+      font-weight: 700;
+    }
+
+    .tab-btn:hover:not(.active) { color: #fff; }
+
+    .tab-content {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    /* Doctrinal 3-Star Deliverables */
+    .doc-page {
+      background: #090e1a;
+      border: 1px solid var(--border);
+      padding: 20px;
+      border-radius: 4px;
+      max-width: 960px;
+      margin: 0 auto;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    }
+
+    .routing-yaml {
+      background: #0b1222;
+      border-left: 3px solid var(--gold);
+      padding: 8px 12px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: #38bdf8;
+      margin-bottom: 16px;
+    }
+
+    .bluf-box {
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid var(--gold);
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+    .bluf-box strong { color: var(--gold); }
+
+    .ccir-banner {
+      background: rgba(225, 29, 72, 0.15);
+      border: 1px solid var(--scarlet-bright);
+      padding: 10px 14px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      color: #fecdd3;
+      font-weight: 600;
+    }
+
+    .doc-page h2 {
+      color: var(--gold);
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 5px;
+      margin: 16px 0 10px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    table.doc-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      font-size: 11.5px;
+    }
+
+    table.doc-table th, table.doc-table td {
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      text-align: left;
+    }
+
+    table.doc-table th {
+      background: #141e34;
+      color: var(--gold);
+      font-size: 10.5px;
+      text-transform: uppercase;
+    }
+
+    table.doc-table tr:nth-child(even) { background: rgba(255,255,255,0.015); }
+
+    /* UxS IPR 6-Slide Storyboard */
+    .storyboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .slide-card {
+      background: #0d1527;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .slide-script {
+      font-style: italic;
+      color: #94a3b8;
+      border-left: 2px solid var(--gold-dim);
+      padding-left: 6px;
+      margin-top: 4px;
+    }
+
+    /* Right Telemetry Window */
+    .telemetry-sidebar {
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .terminal-window {
+      background: #060911;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      color: #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .log-line { display: flex; gap: 8px; word-break: break-all; }
+    .log-ts { color: #64748b; }
+    .log-tag { font-weight: 700; padding: 0 3px; border-radius: 2px; }
+    .tag-SAGE { background: #854d0e; color: #fef08a; }
+    .tag-TIER1 { background: #1e3a8a; color: #bfdbfe; }
+    .tag-TIER2 { background: #4c1d95; color: #ddd6fe; }
+    .tag-TIER3 { background: #065f46; color: #a7f3d0; }
+    .tag-CCIR { background: var(--scarlet-bright); color: #fff; }
+    .tag-QA { background: #0e7490; color: #cffafe; }
+  </style>
+</head>
+<body>
+
+  <div class="banner">
+    <span>UNCLASSIFIED // FOUO</span>
+    <span>•</span>
+    <span>IMPACT LEVEL 5 (IL5) SECURE ENVIRONMENT</span>
+    <span>•</span>
+    <span>TECOM COMMANDING GENERAL (3-STAR) PERSONAL STAFF</span>
+  </div>
+
+  <header>
+    <div class="brand">
+      <span class="badge">SAGE V10 MASTER</span>
+      <div>
+        <h1>TECOM Strategic Academics Guru Executive</h1>
+        <div style="font-size: 11px; color: var(--text-muted);">35-Persona SME Orchestrator Architecture (Tiers 1–3)</div>
+      </div>
+    </div>
+    <div class="header-metrics">
+      <div class="metric-item">
+        <span>ACTIVE MODE:</span>
+        <span class="metric-val" id="metric-mode">FULL STAFF MODE</span>
+      </div>
+      <div class="metric-item">
+        <span>CORE PROCESS:</span>
+        <span class="metric-val" id="metric-process" style="color: var(--cyan-bright);">5. FORCE DEV & JCIDS</span>
+      </div>
+      <div class="metric-item">
+        <span>MOBILIZED SMES:</span>
+        <span class="metric-val" id="metric-smes">7 OF 34</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard">
+
+    <!-- LEFT PANEL: CONTROLS & GOVERNANCE -->
+    <div class="sidebar">
+      <div class="panel-header">Orchestrator Directive Controls</div>
+      <div class="panel-content">
+        
+        <div class="control-group">
+          <label class="control-label">Strategic Mission Scenario</label>
+          <select id="scenario-selector">
+            <option value="suas">1. New sUAS Syllabus Build (Full Staff / JCIDS)</option>
+            <option value="mishap">2. Class A Training Mishap / Supply Shortfall (Crisis / CCIR 3)</option>
+            <option value="burnout">3. Instructor Vacancy & Payroll Cap (Standard / CCIR 1)</option>
+            <option value="policy">4. MCO Directive Retrieval (Lite Mode / Informational)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Execution Controls</label>
+          <button class="primary" id="btn-dispatch">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Mobilize SAGE Staff & Synthesize Brief
+          </button>
+          <button class="secondary" id="btn-trigger-ccir">Inject Simulated CCIR Event</button>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Rule 3: Hierarchy of Truth</label>
+          <div class="hot-box">
+            <div class="hot-step"><span class="hot-num">1</span> <strong>Legality Over All</strong> (SJA overrides all COAs)</div>
+            <div class="hot-step"><span class="hot-num">2</span> <strong>Doctrine & Strategy</strong> (Pubs override science)</div>
+            <div class="hot-step"><span class="hot-num">3</span> <strong>Feasibility</strong> (POM/G-4 overrides desire)</div>
+            <div class="hot-step"><span class="hot-num">4</span> <strong>Human Dynamics</strong> (Culture overrides tech)</div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Rule 17: Running Staff Estimate</label>
+          <div class="estimate-card">
+            <div class="estimate-row"><span>Billet Balance:</span><span id="est-billets" style="color:var(--green-bright);">Neutral (±0 / PL 3-24)</span></div>
+            <div class="estimate-row"><span>Funding Cycle:</span><span id="est-pom">POM-28 Unfunded Gap</span></div>
+            <div class="estimate-row"><span>Facility Lead:</span><span id="est-milcon">18 Mo. SCIF Retrofit</span></div>
+            <div class="estimate-row"><span>Active CCIRs:</span><span id="est-ccir" style="color:var(--green-bright);">NONE ACTIVE</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CENTER PANEL: TOPOLOGY & EXECUTIVE VIEWPORT -->
+    <div class="center-viewport">
+      
+      <!-- Visual SVG Multi-Tier Topology Map -->
+      <div class="topology-container">
+        <svg class="topo-svg" id="topo-svg" viewBox="0 0 880 240">
+          <defs>
+            <filter id="sage-glow">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+
+          <!-- Links from SAGE to Tiers -->
+          <path id="link-t1" class="link-path active" d="M 440,42 L 180,95" />
+          <path id="link-t2" class="link-path active" d="M 440,42 L 440,95" />
+          <path id="link-t3" class="link-path active" d="M 440,42 L 700,95" />
+
+          <!-- Internal Cluster Links -->
+          <path class="link-path active" d="M 180,135 L 70,170" />
+          <path class="link-path active" d="M 180,135 L 180,170" />
+          <path class="link-path active" d="M 180,135 L 290,170" />
+          
+          <path class="link-path active" d="M 440,135 L 390,170" />
+          <path class="link-path active" d="M 440,135 L 490,170" />
+
+          <path class="link-path active" d="M 700,135 L 650,170" />
+          <path class="link-path active" d="M 700,135 L 750,170" />
+
+          <!-- SAGE Mega-Orchestrator Node -->
+          <g class="node-group active" id="node-sage" onclick="viewSmeDetails(0)">
+            <rect class="node-rect" x="320" y="10" width="240" height="42" />
+            <text class="node-title" x="440" y="27" text-anchor="middle">TECOM SAGE MEGA-ORCHESTRATOR</text>
+            <text class="node-sub" x="440" y="40" text-anchor="middle">Chief of Staff / 3-Star Standard Synthesis</text>
+          </g>
+
+          <!-- Tier 1 Hub -->
+          <g class="node-group mobilized" id="node-tier1" onclick="filterByTier(1)">
+            <rect class="node-rect" x="80" y="95" width="200" height="38" />
+            <text class="node-title" x="180" y="111" text-anchor="middle">TIER 1: STRATEGIC / ENTERPRISE</text>
+            <text class="node-sub" x="180" y="123" text-anchor="middle">21 SMEs: JCIDS, G-4, POM, SJA, Policy</text>
+          </g>
+
+          <!-- Tier 2 Hub -->
+          <g class="node-group mobilized" id="node-tier2" onclick="filterByTier(2)">
+            <rect class="node-rect" x="340" y="95" width="200" height="38" />
+            <text class="node-title" x="440" y="111" text-anchor="middle">TIER 2: OPERATIONAL SCHOOLHOUSE</text>
+            <text class="node-sub" x="440" y="123" text-anchor="middle">7 SMEs: POI, S-3 Ops, EdTech, Faculty</text>
+          </g>
+
+          <!-- Tier 3 Hub -->
+          <g class="node-group mobilized" id="node-tier3" onclick="filterByTier(3)">
+            <rect class="node-rect" x="600" y="95" width="200" height="38" />
+            <text class="node-title" x="700" y="111" text-anchor="middle">TIER 3: TACTICAL CLASSROOM</text>
+            <text class="node-sub" x="700" y="123" text-anchor="middle">6 SMEs: 4C-ID, Stress SIT, BARS, Media</text>
+          </g>
+
+          <!-- Sub-clusters -->
+          <g class="node-group mobilized" id="node-sub-cap"><rect class="node-rect" x="20" y="170" width="100" height="34"/><text class="node-title" x="70" y="184" text-anchor="middle">CAPABILITY</text><text class="node-sub" x="70" y="195" text-anchor="middle">SMEs 1–4</text></g>
+          <g class="node-group mobilized" id="node-sub-g4"><rect class="node-rect" x="130" y="170" width="100" height="34"/><text class="node-title" x="180" y="184" text-anchor="middle">G-4 / G-8</text><text class="node-sub" x="180" y="195" text-anchor="middle">SMEs 5–9</text></g>
+          <g class="node-group mobilized" id="node-sub-spec"><rect class="node-rect" x="240" y="170" width="100" height="34"/><text class="node-title" x="290" y="184" text-anchor="middle">SPECIAL STAFF</text><text class="node-sub" x="290" y="195" text-anchor="middle">SMEs 17–21</text></g>
+
+          <g class="node-group mobilized" id="node-sub-ops"><rect class="node-rect" x="350" y="170" width="80" height="34"/><text class="node-title" x="390" y="184" text-anchor="middle">S-3 / POI</text><text class="node-sub" x="390" y="195" text-anchor="middle">SMEs 22–24</text></g>
+          <g class="node-group mobilized" id="node-sub-lms"><rect class="node-rect" x="450" y="170" width="80" height="34"/><text class="node-title" x="490" y="184" text-anchor="middle">EDTECH</text><text class="node-sub" x="490" y="195" text-anchor="middle">SMEs 25–28</text></g>
+
+          <g class="node-group mobilized" id="node-sub-tac"><rect class="node-rect" x="600" y="170" width="100" height="34"/><text class="node-title" x="650" y="184" text-anchor="middle">CURRICULUM</text><text class="node-sub" x="650" y="195" text-anchor="middle">SMEs 29–31</text></g>
+          <g class="node-group mobilized" id="node-sub-sim"><rect class="node-rect" x="710" y="170" width="100" height="34"/><text class="node-title" x="760" y="184" text-anchor="middle">SIM & MEDIA</text><text class="node-sub" x="760" y="195" text-anchor="middle">SMEs 32–34</text></g>
+        </svg>
+      </div>
+
+      <!-- Tabbed Workspace Viewports -->
+      <div class="workspace">
+        <div class="nav-tabs">
+          <button class="tab-btn active" id="tab-brief" onclick="switchTab('brief')">3-Star Executive Brief</button>
+          <button class="tab-btn" id="tab-storyboard" onclick="switchTab('storyboard')">UxS IPR 6-Slide Storyboard</button>
+          <button class="tab-btn" id="tab-arsenal" onclick="switchTab('arsenal')">34-SME Arsenal Catalog</button>
+          <button class="tab-btn" id="tab-qa" onclick="switchTab('qa')">Rule 15 Synthesis Gate Checklist</button>
+        </div>
+
+        <!-- TAB 1: 3-STAR BRIEF -->
+        <div class="tab-content" id="view-brief">
+          <div class="doc-page" id="brief-render">
+            <!-- Dynamic 3-Star Brief -->
+          </div>
+        </div>
+
+        <!-- TAB 2: UXS IPR STORYBOARD -->
+        <div class="tab-content" id="view-storyboard" style="display: none;">
+          <div class="doc-page">
+            <h2>UxS IPR Presentation Architecture (Rule 7 Standard Blueprint)</h2>
+            <div class="storyboard-grid" id="storyboard-render">
+              <!-- Dynamic Slides -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: 34-SME ARSENAL -->
+        <div class="tab-content" id="view-arsenal" style="display: none;">
+          <div class="doc-page">
+            <h2>TECOM 34-Agent SME Arsenal & Echelon Matrix</h2>
+            <div style="margin-bottom: 12px; display: flex; gap: 8px;">
+              <input type="text" id="sme-search" placeholder="Search SME by name, role, order, or keyword..." onkeyup="filterSmeTable()">
+            </div>
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Echelon</th>
+                  <th>SME Persona Title</th>
+                  <th>Core Functional Focus & Mandate</th>
+                  <th>Governing Directives / Orders</th>
+                </tr>
+              </thead>
+              <tbody id="sme-tbody">
+                <!-- Dynamically populated 34 SMEs -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 4: SYNTHESIS GATE QA -->
+        <div class="tab-content" id="view-qa" style="display: none;">
+          <div class="doc-page">
+            <h2>Rule 15: Synthesis Gate & Quality Assurance Matrix</h2>
+            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">Pre-briefing verification gate before emitting 3-Star deliverables to the Commanding General.</p>
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Checkpoint</th>
+                  <th>Verification Mandate</th>
+                  <th>Staff Status</th>
+                  <th>Validation Evidentiary Detail</th>
+                </tr>
+              </thead>
+              <tbody id="qa-tbody">
+                <!-- QA Items -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: EXECUTION TELEMETRY & ROUTING STREAM -->
+    <div class="telemetry-sidebar">
+      <div class="panel-header">
+        <span>Digital Staff Telemetry</span>
+        <button onclick="clearTerminal()" style="width: auto; background: none; border: none; font-size: 10px; color: var(--text-muted); cursor: pointer;">Clear</button>
+      </div>
+      <div class="terminal-window" id="terminal">
+        <!-- Terminal Logs -->
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* 34-AGENT SME ARSENAL DEFINITIONS */
+    const SMES = [
+      { id: 1, tier: 1, wing: "Capability Integration", name: "JCIDS & DOTMLPF-C Requirements Analyst", mandate: "MROC validation, UUNS/UNS gaps, drafts Training & Education pillars of DOTMLPF-C. Defends against unfunded mandates.", orders: "MCO 5311.1E, CJCSI 5123.01H" },
+      { id: 2, tier: 1, wing: "Capability Integration", name: "Total Force Structure (TFSD) & MOS Architect", mandate: "Maps T/O builds, FSRG divestment strategies (bill-payers), and NAVMC 1200.1 MOS Manual updates.", orders: "NAVMC 1200.1, MCO 5311.1" },
+      { id: 3, tier: 1, wing: "Capability Integration", name: "MILCON & Infrastructure Planner", mandate: "Forecasts facility lead-times, SCIF standards, range safety templates/SDZs, and environmental impact.", orders: "ICD/ICS 705, MCO 3550.9, MCO 5090.2" },
+      { id: 4, tier: 1, wing: "Capability Integration", name: "Capabilities Transition (IOC/FOC) Manager", mandate: "Synchronizes multi-functional timelines, manages pilot course validation, and integrates TIP throughput.", orders: "TECOM Campaign Plan, MCO 1553.1D" },
+      { id: 5, tier: 1, wing: "Logistics, G-4/G-8", name: "Resources, Manpower & POM Strategist", mandate: "Analyzes PPBE/POM cycles, civilian personnel hiring guidelines, and payroll caps.", orders: "TECOM Policy Letters 1-25 & 2-23" },
+      { id: 6, tier: 1, wing: "Logistics, G-4/G-8", name: "Supply Chain & Materiel Logistics SME (G-4)", mandate: "Forecasts and manages materiel requirements for schoolhouses, tracks requisitions, warehouse inventory, DLA liaison.", orders: "MCO 4400.150, DODI 4140.01" },
+      { id: 7, tier: 1, wing: "Logistics, G-4/G-8", name: "Maintenance Management & Readiness SME (G-4)", mandate: "Analyzes GCSS-MC reports, identifies maintenance bottlenecks, advises on obsolete gear lifecycle.", orders: "MCO 4790.2, GCSS-MC SOP" },
+      { id: 8, tier: 1, wing: "Logistics, G-4/G-8", name: "Financial Execution & Audit SME (G-8)", mandate: "Tracks obligations and expenditures in SABRS, conducts internal audits, Anti-Deficiency Act compliance.", orders: "DoD FMR 7000.14-R, Anti-Deficiency Act" },
+      { id: 9, tier: 1, wing: "Logistics, G-4/G-8", name: "Aviation Logistics & Readiness SME (G-4 Avn)", mandate: "Aviation-related training logistics, NALCOMIS readiness data, aviation parts workflow.", orders: "NAV-AIR 00-25-100, NALCOMIS SOP" },
+      { id: 10, tier: 1, wing: "Academic Strategy", name: "Enterprise Doctrine & Policy Analyst", mandate: "Cross-references emerging educational concepts against legacy MCOs, SATE, and strategic directives.", orders: "MCDP 7, MCO 1553.1D, SATE Manual" },
+      { id: 11, tier: 1, wing: "Academic Strategy", name: "Cognitive & Learning Science Expert", mandate: "Validates curricula against Cognitive Load Theory (CLT), adult learning (andragogy), and metacognition.", orders: "MCDP 7, Sweller CLT (1988), Knowles" },
+      { id: 12, tier: 1, wing: "Academic Strategy", name: "Org Change & Human Dynamics SME", mandate: "Analyzes macro cultural resistance, Schein/Kotter models, Survival Anxiety vs. Learning Anxiety.", orders: "Schein Org Culture, Kotter 8-Step" },
+      { id: 13, tier: 1, wing: "Academic Strategy", name: "Holistic Human Performance Analyst", mandate: "Correlates biometrics, heart rate variability (HRV), sleep deprivation (WRAIR), and allostatic load.", orders: "WRAIR Human Performance, MCO 6100.13A" },
+      { id: 14, tier: 1, wing: "Academic Strategy", name: "Enterprise KM & O365 Architect", mandate: "Designs secure data taxonomy, SharePoint Online Hub-and-Spoke, Power Platform IL5 automation.", orders: "DoD Cloud Security Guide (IL5), MCO 5210.1" },
+      { id: 15, tier: 1, wing: "Academic Strategy", name: "Executive Staff Action (SSEC) & Policy Editor", mandate: "Enforces military correspondence standards, SSIC assignments, DON TRACKER taskings.", orders: "SECNAV M-5216.5, SECNAV M-5210.2" },
+      { id: 16, tier: 1, wing: "Academic Strategy", name: "Strategic Info Design & Branding SME", mandate: "Translates strategic datasets into Stoplight dashboards, Quad-boards, and command templates.", orders: "TECOM Visual Standards Guide" },
+      { id: 17, tier: 1, wing: "Special Staff", name: "Legal & Ethics Advisor (SJA) SME", mandate: "UCMJ compliance, fiscal law (Anti-Deficiency Act), JER ethics regulations. Reviews investigations.", orders: "UCMJ, DoD 5500.07-R (JER), 31 USC § 1341" },
+      { id: 18, tier: 1, wing: "Special Staff", name: "Strategic Communication & PAO SME", mandate: "Talking points, press releases, strategic messaging for Congress, public, and fleet audiences.", orders: "MCO 5720.77, Joint Pub 3-61" },
+      { id: 19, tier: 1, wing: "Special Staff", name: "Human Capital & Readiness Manager (G-1)", mandate: "Personnel readiness (PERSTATs), instructor wellness, awards, tour length policies.", orders: "MCO 1000.6, MCO 1300.8" },
+      { id: 20, tier: 1, wing: "Special Staff", name: "Threat & Adversary TTP Integration SME", mandate: "Scans DIA, ONI, MCIA intel to ensure training scenarios reflect threat environment (Schoolhouse G-2).", orders: "DIA Threat Estimates, Marine Corps Intel Order" },
+      { id: 21, tier: 1, wing: "Special Staff", name: "Enterprise Assessment SME (Inspector General)", mandate: "Fuses multi-staff data, conducts systemic inspections of MSCs to identify hidden operational risks.", orders: "MCO 5040.6H (IG Program)" },
+      
+      /* TIER 2 */
+      { id: 22, tier: 2, wing: "Operational Wing", name: "POI Lifecycle & Compliance Analyst", mandate: "Reviews Master Lesson Files (MLFs), manages CCRB prep packages, enforces Zero-Growth POI mandate.", orders: "TECOM Policy Letter 3-24, NAVMC 1553.1" },
+      { id: 23, tier: 2, wing: "Operational Wing", name: "Faculty Culture & Development SME", mandate: "Architect of Faculty Development Program (FDP), utilizes Brookfield's Skillful Teacher & Growth Mindset.", orders: "Brookfield (2015), Dweck (2006)" },
+      { id: 24, tier: 2, wing: "Operational Wing", name: "Applied Learning & Scheduling Logistician", mandate: "Restructures linear schedules into interleaved training matrices, manages range constraints & ratios.", orders: "MCO 3550.9, TECOM Scheduling Standard" },
+      { id: 25, tier: 2, wing: "Operational Wing", name: "Instructional Diagnostics Analyst", mandate: "Educational data analyst. Reviews test scores, attrition rates, root-cause diagnostics of failures.", orders: "SATE Evaluation Phase, MCO 1553.1D" },
+      { id: 26, tier: 2, wing: "Operational Wing", name: "EdTech & LMS Administrator", mandate: "Translates pedagogy into digital delivery, Canvas/MarineNet integrations, SCORM packages.", orders: "MarineNet Operating SOP, SCORM 2004" },
+      { id: 27, tier: 2, wing: "Operational Wing", name: "S-3 Operations & Battle Rhythm Manager", mandate: "Synchronizes schoolhouse staff calendar, operational reporting, enforces '7-Minute Drills'.", orders: "TECOM Battle Rhythm SOP" },
+      { id: 28, tier: 2, wing: "Operational Wing", name: "Operational Instructional Graphics Coordinator", mandate: "Workflow scheduling swimlanes, Gantt timelines, resource allocation charts, diagnostic graphics.", orders: "TECOM Graphics Guide Tier 2" },
+
+      /* TIER 3 */
+      { id: 29, tier: 3, wing: "Tactical Wing", name: "Curriculum Architecture (ADDIE/4C-ID) SME", mandate: "Drafts precise TLOs/ELOs (Condition, Behavior, Standard) and structures lessons using 4C-ID.", orders: "Van Merriënboer 4C-ID, NAVMC 1553.1" },
+      { id: 30, tier: 3, wing: "Tactical Wing", name: "Stress Inoculation & Scenario Designer", mandate: "Calibrates tactical scenarios and TDGs to keep learners in the optimal zone of stress inoculation (SIT).", orders: "Meichenbaum SIT, MCDP 1 Warfighting" },
+      { id: 31, tier: 3, wing: "Tactical Wing", name: "Tactical Assessment & Evaluation SME", mandate: "Builds Behaviorally Anchored Rating Scales (BARS) to objectively grade situational awareness.", orders: "Endsley SA Model, BARS Rubrics" },
+      { id: 32, tier: 3, wing: "Tactical Wing", name: "Classroom Facilitation Coach", mandate: "Provides real-time Socratic questioning guides, classroom management, psychologically safe AARs.", orders: "MCDP 7 Companion Guide, Socratic Method" },
+      { id: 33, tier: 3, wing: "Tactical Wing", name: "Tactical Automation & Workflow Scripter", mandate: "Low-code O365 automations (VBA macros, Power Automate, Forms) to eliminate instructor administrivia.", orders: "IL5 Power Platform SOP" },
+      { id: 34, tier: 3, wing: "Tactical Wing", name: "Tactical Media & Simulator Designer", mandate: "Tactical maps, sand-table layouts, graphic test items, visual BARS rubrics, stress waveforms.", orders: "TECOM Visual Standards Tier 3" }
+    ];
+
+    let activeScenario = "suas";
+    let activeCCIR = false;
+
+    /* TERMINAL UTILITY */
+    function logEvent(tag, message) {
+      const term = document.getElementById("terminal");
+      const d = new Date();
+      const ts = d.toTimeString().split(" ")[0] + "." + String(d.getMilliseconds()).padStart(3, "0");
+      const div = document.createElement("div");
+      div.className = "log-line";
+      div.innerHTML = `
+        <span class="log-ts">[${ts}]</span>
+        <span class="log-tag tag-${tag}">${tag}</span>
+        <span>${escapeHtml(message)}</span>
+      `;
+      term.appendChild(div);
+      term.scrollTop = term.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function clearTerminal() {
+      document.getElementById("terminal").innerHTML = "";
+    }
+
+    /* SCENARIO RENDER DATA */
+    const SCENARIOS = {
+      suas: {
+        title: "Enterprise Small Unmanned Aircraft Systems (sUAS) Tactical Syllabus Modernization",
+        process: "5. Force Development & Capability Integration (JCIDS)",
+        tier: "Multi (Tiers 1, 2, 3)",
+        smes: [1, 3, 5, 6, 11, 17, 22, 29],
+        mode: "Full Staff",
+        sequence: "Direct Handoffs (Sequential & Parallel)",
+        ccir: false,
+        billet: "Neutral (±0 Net Growth via Divestment)",
+        pom: "POM-28 Offset Required ($1.8M)",
+        milcon: "Requires 14-Month SDZ Airspace Certification",
+        bluf: "Sir, we must authorize the zero-cost sUAS Tactical Syllabus transition via FRAGO 01-26, enforcing immediate curriculum offsets to absorb high-stress drone operations without expanding the schoolhouse program of instruction.",
+        context: "Peer adversary electronic warfare and autonomous drone swarms require junior leaders to achieve cognitive overmatch at the tactical edge [DIA Threat Estimate 2026, Ch. 2]. TECOM must modernize the sUAS syllabus within the Zero-Growth POI mandate [TECOM PL 3-24].",
+        analysis: [
+          { header: "Feasibility Over Desire (Rule 3 Applied)", text: "Cognitive Science SME (SME 11) recommended dedicated multi-million-dollar VR flight simulators. However, POM Strategist (SME 5) and G-4 (SME 6) report an unfunded $3.2M gap and supply chain lead times of 16 months. Applying the Hierarchy of Truth, SAGE rejected the VR simulator COA in favor of commercial-derivative quadcopters interleaved with tactical decision games." },
+          { header: "Capability Integration & Force Structure", text: "JCIDS Analyst (SME 1) validated the DOTMLPF-C requirement against MROC 42-25. MILCON Planner (SME 3) confirmed that restricted airspace SDZ templates can be shared with Range 214 without expanding current base boundaries [MCO 3550.9]." },
+          { header: "Schoolhouse Compliance & Strategic Uplift", text: "POI Compliance Analyst (SME 22) verified that adding 18 hours of tactical drone flight was 100% offset by divesting 18 hours of legacy slide-based lectures, maintaining strict Zero-Growth compliance [TECOM PL 3-24]. Translating this tactical adjustment to strategic impact, zero additional billet authorizations are required across the FYDP." }
+        ],
+        assumptions: [
+          "1. Airspace authorization for Class 1 sUAS under 1,200 ft AGL remains grandfathered under existing MOA.",
+          "2. Commercial battery logistics pipelines can be sustained through standard DLA channels without specialized hazmat requisitions."
+        ],
+        risk: {
+          exec: "Minor instructor 'Learning Anxiety' [Schein, 1996] during transition from legacy systems to tactical tablet controllers.",
+          inaction: "Catastrophic loss of battlefield cognitive overmatch; USMC infantry squads deployed without counter-UAS and tactical sUAS integration."
+        },
+        holyTrinity: {
+          manpower: "Green | Zero Billet Growth (T/O Neutral) per PL 2-23.",
+          funding: "Amber | Absorbed within current O&M budget; POM-28 offset identified.",
+          facilities: "Green | Utilizes existing Range 214 SDZ footprint."
+        },
+        decision: "Approve and sign FRAGO 01-26 (Directing sUAS POI Zero-Growth Integration)."
+      },
+      mishap: {
+        title: "Immediate Action: Schoolhouse Class A Mishap & Ammunition Shortage",
+        process: "3. Current Operations & Crisis Management",
+        tier: "Tier 1 & Tier 2 Special Staff",
+        smes: [6, 7, 17, 18, 27],
+        mode: "Crisis Action",
+        sequence: "Parallel Crisis Action Team",
+        ccir: true,
+        ccirType: "CCIR 3 (Logistics Failure & Class A Mishap)",
+        billet: "Unchanged",
+        pom: "Investigation Cost Reserve",
+        milcon: "Range 400 Frozen Pending SJA Review",
+        bluf: "Sir, we must freeze live-fire operations on Range 400 immediately and reallocate 5.56mm linked training ammunition from Depot storage to prevent cancellation of the upcoming Marine Combat Training battalion graduation.",
+        context: "A weapon malfunction on Range 400 resulted in a Class A training mishap today at 0830. Simultaneously, a 28% ammunition supply delivery failure threatens to cancel remaining POI qualification events [CCIR 3 Triggered].",
+        analysis: [
+          { header: "Legal Clearance Over All (Hierarchy of Truth)", text: "SJA SME (SME 17) has mandated an immediate investigative freeze under JAGMAN 02-26. No live-fire training will occur until the investigating officer clears the range blast template." },
+          { header: "Logistical Mitigation (G-4 & Readiness)", text: "G-4 Logistics SME (SME 6) and Maintenance SME (SME 7) identified 120,000 rounds of linked 5.56mm stored at Depot reserve that can be emergency-requisitioned via GCSS-MC within 18 hours." },
+          { header: "Strategic Communication & PAO Plan", text: "PAO SME (SME 18) has drafted preliminary holding statements adhering to DoD release guidelines, shielding the command from premature media speculation." }
+        ],
+        assumptions: [
+          "1. Range safety template did not fail due to structural ammunition lot defects.",
+          "2. Emergency reallocation does not degrade 2nd Marine Division operational reserves."
+        ],
+        risk: {
+          exec: "48-hour student delay in graduation schedule while transitioning to synthetic marksmanship trainers.",
+          inaction: "Violations of statutory safety mandates and potential Anti-Deficiency Act infractions regarding depot transport."
+        },
+        holyTrinity: {
+          manpower: "Green | Full instructor coverage on standby.",
+          funding: "Green | Transportation absorbed in baseline operational contingency.",
+          facilities: "Red | Range 400 red-lined pending JAGMAN inquiry."
+        },
+        decision: "Authorize emergency ammunition transfer order and execute Range 400 investigative freeze."
+      },
+      burnout: {
+        title: "Schoolhouse Instructor Attrition & Civilian Payroll Cap Mitigation",
+        process: "6. Human Capital Management",
+        tier: "Tier 1 & Tier 2 Staff",
+        smes: [5, 12, 19, 23, 33],
+        mode: "Standard",
+        sequence: "Sequential Staff Handoff",
+        ccir: true,
+        ccirType: "CCIR 1 (Personnel Readiness: 16.5% Vacancy Rate)",
+        billet: "Manning Cap Restructure",
+        pom: "Payroll Cap Enforced [PL 2-23]",
+        milcon: "Neutral",
+        bluf: "Sir, we must deploy the Tactical Automation Suite across all formal schoolhouses to reclaim 4,200 instructor hours annually, directly mitigating the 16.5% vacancy rate without breaching the civilian payroll ceiling mandated by Policy Letter 2-23.",
+        context: "Infantry Training Battalion reports a critical instructor vacancy rate of 16.5% lasting over 35 consecutive days, triggering CCIR 1. Civilian hiring freezes prevent hiring contract adjuncts.",
+        analysis: [
+          { header: "Strategic Uplift of Tactical Automation", text: "Tactical Automation Scripter (SME 33) developed low-code O365 Power Automate muster flows that reduce daily instructor admin by 65 minutes per Marine. SAGE elevated this tactical data to strategic impact: across 280 instructors, this recovers 4,200 productive podium hours per year, neutralizing the vacancy deficit without hiring a single civilian contractor." },
+          { header: "Human Dynamics & Faculty Culture", text: "Org Change SME (SME 12) and Faculty Development SME (SME 23) noted severe instructor burnout caused by outdated manual grading logs. Transitioning to automated forms restores instructor psychological safety [Brookfield, 2015]." },
+          { header: "Fiscal & Manpower Compliance", text: "POM Strategist (SME 5) confirms this COA maintains 100% adherence to civilian payroll controls [TECOM Policy Letter 2-23], preserving $1.4M in personnel payroll reserve." }
+        ],
+        assumptions: [
+          "1. Schoolhouse O365 tenant maintains IL5 Authority to Operate (ATO).",
+          "2. Active-duty instructor rotations remain stable through Q3 FY26."
+        ],
+        risk: {
+          exec: "Short-term resistance from legacy Master Sergeants preferring physical logbooks.",
+          inaction: "Compounded instructor burnout leading to a 25% drop in student throughput by Q4."
+        },
+        holyTrinity: {
+          manpower: "Amber | Mitigates active 16.5% instructor shortage through automation.",
+          funding: "Green | Zero external cost; runs within existing O365 enterprise license.",
+          facilities: "Green | No facility footprint changes."
+        },
+        decision: "Mandate enterprise deployment of the TECOM Low-Code Instructor Automation Suite."
+      },
+      policy: {
+        title: "Doctrinal Verification & Order Hierarchy Inquiry",
+        process: "1. Battle Rhythm & Policy Retrieval",
+        tier: "Tier 1",
+        smes: [10],
+        mode: "Lite",
+        sequence: "Single SME Direct Retrieval",
+        ccir: false,
+        billet: "N/A",
+        pom: "N/A",
+        milcon: "N/A",
+        bluf: "Sir, MCO 1553.1D remains the authoritative source for SATE course development, establishing that no formal school POI may exceed approved duration without Commanding General TECOM written waiver.",
+        context: "Clarification requested regarding the precedence of local Standard Operating Procedures versus Marine Corps Orders in POI duration modifications.",
+        analysis: [
+          { header: "Doctrinal Supremacy Analysis", text: "Enterprise Doctrine & Policy Analyst (SME 10) reviewed MCO 1553.1D and TECOM Policy Letter 3-24. Doctrinal hierarchy dictates that Marine Corps Orders supersede schoolhouse SOPs. Local commanders cannot lengthen course lengths without an approved Curriculum Change Request Package (CCRB) signed by the CG." }
+        ],
+        assumptions: ["All formal schools operate under current NAVMC 1553.1 SATE standards."],
+        risk: { exec: "None.", inaction: "Risk of uncoordinated course expansion across MSCs." },
+        holyTrinity: { manpower: "Green", funding: "Green", facilities: "Green" },
+        decision: "Reiterate MCO 1553.1D supremacy via Staff Advisory Notice."
+      }
+    };
+
+    /* RENDER 3-STAR BRIEF */
+    function renderBrief() {
+      const data = SCENARIOS[activeScenario];
+      const container = document.getElementById("brief-render");
+
+      let smesList = data.smes.map(id => {
+        const s = SMES.find(x => x.id === id);
+        return s ? `${s.id}. ${s.name}` : `SME ${id}`;
+      }).join(", ");
+
+      let html = `
+        <!-- Rule 14 Structured Routing Slip -->
+        <div class="routing-yaml">
+PROCESS: ${data.process}
+TIER: ${data.tier}
+SMEs TO TASK: [${smesList}]
+MODE: ${data.mode}
+SEQUENCE: ${data.sequence}
+        </div>
+      `;
+
+      if (data.ccir) {
+        html += `
+          <div class="ccir-banner">
+            🚨 INTERRUPT: IMMEDIATE ACTION REQUIRED — ${data.ccirType} TRIGGERED.
+            <div style="font-size: 11px; margin-top: 4px; font-weight: normal;">Automated proactive notification dispatched to CG TECOM staff per Directive Rule 13.</div>
+          </div>
+        `;
+      }
+
+      html += `
+        <!-- Rule 6: 3-Star BLUF -->
+        <div class="bluf-box">
+          <strong>BLUF:</strong> ${data.bluf}
+        </div>
+
+        <h2>Strategic Context & "So What"</h2>
+        <p style="font-size: 12.5px; color: #cbd5e1; margin-bottom: 12px;">${data.context}</p>
+
+        <h2>Synthesized Multi-Domain Analysis (Hierarchy of Truth Enforced)</h2>
+      `;
+
+      data.analysis.forEach(a => {
+        html += `
+          <div style="margin-bottom: 12px;">
+            <h3 style="color: var(--cyan-bright); font-size: 12.5px; margin-bottom: 4px;">• ${a.header}</h3>
+            <p style="font-size: 12px; color: #cbd5e1;">${a.text}</p>
+          </div>
+        `;
+      });
+
+      html += `
+        <h2>Planning Assumptions & Limitations</h2>
+        <ul style="margin-left: 20px; font-size: 12px; color: #cbd5e1; margin-bottom: 12px;">
+          ${data.assumptions.map(as => `<li>${as}</li>`).join("")}
+        </ul>
+
+        <h2>Strategic Risk Assessment Matrix</h2>
+        <table class="doc-table">
+          <thead>
+            <tr><th>Risk of Execution (Internal Friction)</th><th>Risk of Inaction (Fleet Operational Risk)</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color: #fca5a5;">${data.risk.exec}</td>
+              <td style="color: #f87171; font-weight: 600;">${data.risk.inaction}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>Resource & Policy Implications (The Holy Trinity)</h2>
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>1. Manpower (T/O & Billets)</th>
+              <th>2. Funding (POM & Budget)</th>
+              <th>3. Facilities (MILCON & Ranges)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${data.holyTrinity.manpower}</td>
+              <td>${data.holyTrinity.funding}</td>
+              <td>${data.holyTrinity.facilities}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>Recommended Staff Action</h2>
+        <div style="background: #0f1c33; border: 1px solid var(--gold); padding: 10px; border-radius: 4px; font-weight: 700; color: #fff;">
+          DECISION FOR THE CG: ${data.decision}
+        </div>
+      `;
+
+      container.innerHTML = html;
+      renderStoryboard();
+      renderQA();
+    }
+
+    /* RENDER UXS IPR 6-SLIDE STORYBOARD */
+    function renderStoryboard() {
+      const data = SCENARIOS[activeScenario];
+      const grid = document.getElementById("storyboard-render");
+
+      grid.innerHTML = `
+        <div class="slide-card">
+          <div class="slide-header"><span>SLIDE 1: AGENDA & BLUF</span><span class="badge" style="background:#1e3a8a">THE HOOK</span></div>
+          <div><strong>Layout:</strong> Split-screen (Left: 4 Agenda items; Right: Highlighted BLUF block).</div>
+          <div style="color: var(--cyan-bright);"><strong>Text:</strong> Max 15 words/bullet per SAGE constraint.</div>
+          <div class="slide-script">"Sir, this brief outlines the path to modernizing our schoolhouse within strict fiscal and personnel limits."</div>
+        </div>
+
+        <div class="slide-card">
+          <div class="slide-header"><span>SLIDE 2: STRATEGIC CONTEXT</span><span class="badge" style="background:#1e3a8a">PROBLEM FRAME</span></div>
+          <div><strong>Layout:</strong> Threat vs. Vulnerability Balance Scale diagram.</div>
+          <div style="color: var(--cyan-bright);"><strong>Content:</strong> Adversary EW/UAS overmatch vs. Legacy linear training POI.</div>
+          <div class="slide-script">"Our current linear training model is a tactical vulnerability; we must pivot to active, scenario-based learning."</div>
+        </div>
+
+        <div class="slide-card">
+          <div class="slide-header"><span>SLIDE 3: THE FRAMEWORK</span><span class="badge" style="background:#1e3a8a">THE SOLUTION</span></div>
+          <div><strong>Layout:</strong> Horizontal 4-Step Chevron Process (Crawl, Walk, Run, Overmatch).</div>
+          <div style="color: var(--cyan-bright);"><strong>Constraint:</strong> Max 10 words per chevron.</div>
+          <div class="slide-script">"This phased framework breaks implementation down into crawl, walk, run stages, stabilizing our instructor force."</div>
+        </div>
+
+        <div class="slide-card">
+          <div class="slide-header"><span>SLIDE 4: THE HOLY TRINITY</span><span class="badge" style="background:#1e3a8a">RESOURCES</span></div>
+          <div><strong>Layout:</strong> 3-Column RAG Stoplight Grid: Manpower | Funding | Facilities.</div>
+          <div style="color: var(--gold);"><strong>Status:</strong> ${data.holyTrinity.manpower.split("|")[0]} / ${data.holyTrinity.funding.split("|")[0]} / ${data.holyTrinity.facilities.split("|")[0]}</div>
+          <div class="slide-script">"This matrix proves SAGE's course of action is zero-cost and billet-neutral, fully compliant with PL 2-23."</div>
+        </div>
+
+        <div class="slide-card">
+          <div class="slide-header"><span>SLIDE 5: THE WAY AHEAD</span><span class="badge" style="background:#1e3a8a">TIMELINE</span></div>
+          <div><strong>Layout:</strong> Gantt Chevron Timeline (0–60 Days, 6–12 Mo., 24 Mo.).</div>
+          <div style="color: var(--cyan-bright);"><strong>Milestones:</strong> S-3 Publishes MTS -> Launch Peer Coaching -> FOC TIP Ingest.</div>
+          <div class="slide-script">"This timeline maps out our critical path milestones, highlighting cross-staff deliverables across the FYDP."</div>
+        </div>
+
+        <div class="slide-card">
+          <div class="slide-header"><span>SLIDE 6: DECISION BOARD</span><span class="badge" style="background:#881337">SIGNATURE</span></div>
+          <div><strong>Layout:</strong> Central Approval Checklist & Mock Signature Block.</div>
+          <div style="color: var(--gold-dim);"><strong>Status:</strong> DECISION PENDING COMMANDING GENERAL SIGNATURE</div>
+          <div class="slide-script">"Sir, SAGE recommends you sign the attached FRAGO today to authorize this transition and enforce curriculum offsets."</div>
+        </div>
+      `;
+    }
+
+    /* RENDER ARSENAL CATALOG */
+    function renderArsenal() {
+      const tbody = document.getElementById("sme-tbody");
+      tbody.innerHTML = SMES.map(s => `
+        <tr>
+          <td style="font-family: var(--font-mono); font-weight: 700; color: var(--gold);">${s.id}</td>
+          <td><span class="badge badge-tier${s.tier}">Tier ${s.tier}</span></td>
+          <td style="font-weight: 700; color: #fff;">${s.name}</td>
+          <td style="font-size: 11.5px; color: #cbd5e1;">${s.mandate}</td>
+          <td style="font-family: var(--font-mono); font-size: 10.5px; color: var(--cyan-bright);">${s.orders}</td>
+        </tr>
+      `).join("");
+    }
+
+    function filterSmeTable() {
+      const q = document.getElementById("sme-search").value.toLowerCase();
+      const rows = document.querySelectorAll("#sme-tbody tr");
+      rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        r.style.display = text.includes(q) ? "" : "none";
+      });
+    }
+
+    /* RENDER SYNTHESIS GATE QA */
+    function renderQA() {
+      const tbody = document.getElementById("qa-tbody");
+      const data = SCENARIOS[activeScenario];
+
+      const checks = [
+        { name: "Legal Clearance (SJA Review)", desc: "Verified zero Anti-Deficiency Act infractions, statutory UCMJ compliance, and JER ethical alignment.", status: "CLEARED", detail: "SJA SME 17 completed formal legal review; findings binding per Hierarchy Rule 1." },
+        { name: "Strategic Uplift Check", desc: "Lower-echelon tactical/operational metrics translated into enterprise readiness impacts for 3-Star.", status: "VERIFIED", detail: "Instructor automation translated directly into 4,200 annual hours saved and payroll cap defense." },
+        { name: "Grounded Citation Standard", desc: "All strategic claims paired with bracketed primary document IDs [Doc_ID, Ch. X, Pg. Y].", status: "VERIFIED", detail: "Grounding verified against MCO 1553.1D, PL 2-23, PL 3-24, and MCDP 7 without hallucinated metadata." },
+        { name: "Binary Decision Point", desc: "Brief concludes with explicit, actionable approval choice for the Commanding General.", status: "CLEARED", detail: `Concrete decision provided: '${data.decision}'` }
+      ];
+
+      tbody.innerHTML = checks.map(c => `
+        <tr>
+          <td style="font-weight: 700; color: var(--gold);">${c.name}</td>
+          <td style="font-size: 11.5px;">${c.desc}</td>
+          <td><span class="badge" style="background:#065f46">COMPLIANT</span></td>
+          <td style="font-size: 11px; color: #94a3b8;">${c.detail}</td>
+        </tr>
+      `).join("");
+    }
+
+    /* TAB SWITCHER */
+    function switchTab(t) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById("view-brief").style.display = "none";
+      document.getElementById("view-storyboard").style.display = "none";
+      document.getElementById("view-arsenal").style.display = "none";
+      document.getElementById("view-qa").style.display = "none";
+
+      document.getElementById(`tab-${t}`).classList.add("active");
+      document.getElementById(`view-${t}`).style.display = "block";
+    }
+
+    /* SIMULATION DISPATCH */
+    function dispatchScenario() {
+      const scenKey = document.getElementById("scenario-selector").value;
+      activeScenario = scenKey;
+      const data = SCENARIOS[scenKey];
+
+      // Update UI Header Metrics
+      document.getElementById("metric-mode").textContent = `${data.mode.toUpperCase()} MODE`;
+      document.getElementById("metric-process").textContent = data.process;
+      document.getElementById("metric-smes").textContent = `${data.smes.length} OF 34`;
+
+      // Update Running Estimates
+      document.getElementById("est-billets").textContent = data.billet;
+      document.getElementById("est-pom").textContent = data.pom;
+      document.getElementById("est-milcon").textContent = data.milcon;
+      
+      const ccirBox = document.getElementById("est-ccir");
+      if (data.ccir) {
+        ccirBox.textContent = data.ccirType;
+        ccirBox.style.color = "var(--scarlet-bright)";
+      } else {
+        ccirBox.textContent = "NONE ACTIVE";
+        ccirBox.style.color = "var(--green-bright)";
+      }
+
+      // Log dispatch events in telemetry
+      logEvent("SAGE", `Processing incoming inquiry: "${data.title}"`);
+      logEvent("SAGE", `Core Process Initiated: [${data.process}]. Triage Mode: [${data.mode}].`);
+      
+      data.smes.forEach(id => {
+        const s = SMES.find(x => x.id === id);
+        if (s) {
+          logEvent(`TIER${s.tier}`, `Tasking SME #${s.id} (${s.name}). Domain: ${s.wing}.`);
+        }
+      });
+
+      if (data.ccir) {
+        logEvent("CCIR", `🚨 INTERRUPT TRIGGERED: ${data.ccirType}. Executing immediate notification protocol.`);
+      }
+
+      logEvent("QA", "Rule 15 Synthesis Gate initiated: Legal, Uplift, Citation, and Decision checkpoints cleared.");
+      logEvent("SAGE", "Staff synthesis complete. Emitting 3-Star Standard Executive Brief and 6-Slide UxS Storyboard.");
+
+      renderBrief();
+    }
+
+    function injectCCIR() {
+      logEvent("CCIR", "🚨 CRITICAL TRIGGER: CCIR 2 (Threat Overmatch) reported by Threat Integration SME #20.");
+      logEvent("CCIR", "Adversary drone swarm EW payload identified in PACOM theater not addressed in current POIs.");
+      logEvent("SAGE", "Suspending standard battle rhythm. Mobilizing Crisis Action Team (CAT).");
+      alert("CCIR 2 TRIGGERED: Threat Overmatch identified by SME #20. Crisis Action Team mobilized.");
+    }
+
+    function viewSmeDetails(id) {
+      if (id === 0) {
+        switchTab("brief");
+        return;
+      }
+      switchTab("arsenal");
+      document.getElementById("sme-search").value = `SME ${id}`;
+      filterSmeTable();
+    }
+
+    function filterByTier(tierNum) {
+      switchTab("arsenal");
+      document.getElementById("sme-search").value = `Tier ${tierNum}`;
+      filterSmeTable();
+    }
+
+    /* INIT */
+    window.addEventListener("DOMContentLoaded", () => {
+      renderArsenal();
+      renderBrief();
+
+      document.getElementById("btn-dispatch").addEventListener("click", dispatchScenario);
+      document.getElementById("btn-trigger-ccir").addEventListener("click", injectCCIR);
+      document.getElementById("scenario-selector").addEventListener("change", dispatchScenario);
+
+      logEvent("SAGE", "TECOM SAGE Master Orchestrator (Version 10.0) Online.");
+      logEvent("SAGE", "34 Subject Matter Expert agents synchronized across Tiers 1, 2, and 3.");
+      logEvent("SAGE", "Rule 3 Hierarchy of Truth and Rule 13 CCIR monitors armed.");
+    });
+  </script>
+</body>
+</html>
