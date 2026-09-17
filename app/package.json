@@ -1,0 +1,16 @@
+{
+  "name": "sage-briefing-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SAGE Briefing Application — local single-user desktop web app operationalizing the TECOM SAGE Master Orchestration Directive (v10).",
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  }
+}
